@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp">
+        <RelativeLayout
+            android:id="@+id/layout_top"
+            style="@style/layout_top_style">
+            <ImageView
+                android:id="@+id/btn_back"
+                style="@style/sur_det_back_img_sty"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentLeft="true" />
+            <TextView
+                android:id="@+id/tv_survey_status"
+                style="@style/sur_det_status_style"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentLeft="true" />
+            <TextView
+                android:id="@+id/tv_title_survey"
+                style="@style/sur_det_tit_style"
+                android:text="1TESTQUERYPARAMS 2TESTQUERYPARAMSsgfdsgdfsdgsf 3TESTQUERYPARAMS 4TESTQUERYPARAMS 5TESTQUERYPARAMS 6TESTQUERYPARAMS"
+                android:layout_above="@id/tv_survey_status"/>
+
+        </RelativeLayout>
+        <RelativeLayout
+            android:id="@+id/layout_bottom"
+            style="@style/bottom_layout_style"
+            android:layout_below="@+id/layout_top"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true">
+            <LinearLayout
+                android:id="@+id/container_approx_status_counter"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal"
+                android:weightSum="3">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+                    <ImageView
+                        style="@style/container_image_style"
+                        android:src="@drawable/icon_calendar"/>
+                    <TextView
+                        android:layout_gravity="center"
+                        android:text="@string/unscheduled_str"
+                        style="@style/sur_det_nooftimtak_style"
+                        android:id="@+id/tv_from_to_date" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="1dp"
+                    android:layout_height="match_parent"
+                    android:background="@color/divider_bg"/>
+
+
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+                    <ImageView
+                        style="@style/container_image_style"
+                        android:src="@drawable/icon_approx_time"/>
+                    <TextView
+                        android:layout_gravity="center"
+                        android:id="@+id/tv_approx_time"
+                        style="@style/sur_det_nooftimtak_style"
+                        android:text="@string/approx_time" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/counter_divider"
+                    android:layout_width="1dp"
+                    android:layout_height="match_parent"
+                    android:background="@color/divider_bg"
+                    android:orientation="vertical"/>
+
+                <LinearLayout
+                    android:id="@+id/counter_layout"
+                    style="@style/counter_layout_style">
+
+                    <TextView
+                        android:id="@+id/tv_counter"
+                        style="@style/sur_det_counter_count_style"/>
+
+                    <TextView
+                        android:id="@+id/tv_number_of_times_taken"
+                        style="@style/sur_det_nooftimtak_style"
+                        android:text="@string/nooftimtak_str" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+        </RelativeLayout>
+        <ImageView
+            android:id="@+id/btn_take_survey"
+            android:layout_above="@id/layout_bottom"
+            style="@style/take_survey_btn"/>
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/divider"
+            android:layout_below="@id/layout_bottom"></View>
+
+        <LinearLayout
+            android:id="@+id/survey_result_layout"
+            style="@style/survey_result_layout_style"
+            android:layout_below="@id/layout_bottom">
+
+            <TextView
+                android:id="@+id/btn_upload_survey_result"
+                style="@style/sur_det_upl_sur_res_style"
+                android:layout_below="@+id/header_frame_lay" />
+
+            <TextView
+                android:id="@+id/btn_take_trial"
+                style="@style/sur_det_take_tra_style"
+                android:layout_below="@+id/btn_upload_survey_result"
+                />
+        </LinearLayout>
+
+        <ProgressBar
+            android:id="@+id/survey_progress_bar"
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+            android:indeterminate="false"
+            android:max="100"
+            android:progress="0"
+            android:layout_marginTop="20dp"
+            android:layout_below="@id/survey_result_layout"
+            android:visibility="gone" />
+
+    </RelativeLayout>
+</ScrollView>
