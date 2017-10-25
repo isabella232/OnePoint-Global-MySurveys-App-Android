@@ -1,0 +1,40 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:shimmer="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/survey_list_container"
+    tools:context="com.opg.my.surveys.lite.Fragments.SurveyByListFragment">
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <com.opg.my.surveys.lite.ShimmerFrameLayout
+            android:id="@+id/shimmer_view_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            shimmer:duration="2000">
+            <android.support.v7.widget.RecyclerView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:id="@+id/surveys_rv"/>
+        </com.opg.my.surveys.lite.ShimmerFrameLayout>
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/divider"
+            android:layout_below="@id/shimmer_view_container">
+        </View>
+    </RelativeLayout>
+    <TextView
+        android:id="@+id/no_surveys_tv"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top"
+        android:gravity="center"
+        android:visibility="gone"
+        android:textSize="@dimen/primary_text_size"
+        android:text="@string/no_surveys_msg"/>
+
+
+</FrameLayout>

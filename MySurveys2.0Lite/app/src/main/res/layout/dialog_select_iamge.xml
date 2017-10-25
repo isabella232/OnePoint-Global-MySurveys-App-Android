@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:orientation="vertical">
+
+        <!--<TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:gravity="center_horizontal"
+            tools:text="@string/title_select_photo"
+            android:textSize="@dimen/primary_text_size"
+            android:textColor="@color/colorPrimary"
+            android:layout_marginTop="25dp"/>&lt;!&ndash;&ndash;&gt;-->
+        <TextView
+            android:id="@+id/tv_select_image_title"
+            style="@style/tv_select_image_title_sytle"/>
+
+        <LinearLayout
+            style="@style/select_image_container_style">
+
+            <LinearLayout
+                android:id="@+id/container_gallery"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <ImageView
+                   style="@style/gallery_btn_style"/>
+
+                <TextView
+                    style="@style/tv_gallery_style"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/container_camera"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <ImageView
+                    style="@style/camera_btn_style"/>
+
+                <TextView
+                    style="@style/tv_camera_style"/>
+            </LinearLayout>
+
+            <!--<LinearLayout
+                android:id="@+id/container_remove_image"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <ImageView
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:background="@drawable/image_border"
+                    android:padding="10dp"
+                    android:src="@drawable/profile_delete"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/delete_image"
+                    android:textSize="@dimen/secondary_text_size"/>
+            </LinearLayout>-->
+
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/btn_cancel_select_image"
+            style="@style/btn_cancel_select_image_style"/>
+    </LinearLayout>
+</RelativeLayout>

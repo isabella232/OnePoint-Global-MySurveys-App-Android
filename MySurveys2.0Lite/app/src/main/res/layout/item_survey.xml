@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    style="@style/sur_lst_itm_main_lay_style">
+
+    <TextView
+        style="@style/sur_lst_item_title_style"
+        android:layout_toLeftOf="@+id/tv_counter"
+        android:id="@+id/survey_title_tv"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true" />
+
+    <TextView
+        android:id="@+id/survey_status_tv"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        style="@style/survey_list_item_status"
+        android:clickable="true"/>
+
+    <ImageView
+        android:id="@+id/iv_sur_det"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:foregroundGravity="right"
+        style="@style/survey_list_item_action_btn" />
+
+    <TextView
+        android:id="@+id/tv_counter"
+        style="@style/tv_counter_style"
+        android:layout_toLeftOf="@id/iv_sur_det"
+        android:visibility="gone" />
+
+    <ProgressBar
+        android:id="@+id/survey_progress_bar"
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+        android:indeterminate="false"
+        android:max="100"
+        android:progress="0"
+        android:layout_alignParentBottom="true"
+        android:visibility="invisible" />
+
+</RelativeLayout>
