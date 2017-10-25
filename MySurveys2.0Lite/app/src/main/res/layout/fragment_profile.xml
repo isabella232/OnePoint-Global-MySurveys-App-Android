@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--Reason for using NestedScrollView
+ http://stackoverflow.com/questions/39091891/collapsingtoolbarlayout-not-collapsing-when-using-viewpager-->
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <RelativeLayout
+       style="@style/profile_img_lay_style">
+        <TextView
+            android:id="@+id/tv_profile"
+            style="@style/tv_profile_style"/>
+
+        <TextView
+            android:id="@+id/tv_edit"
+            style="@style/tv_edit_style"/>
+
+        <RelativeLayout
+            android:id="@+id/profile_container"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_centerInParent="true">
+
+            <com.opg.my.surveys.lite.common.RoundedImageView
+                android:id="@+id/img_profile"
+                style="@style/img_profile_style" />
+            <ProgressBar
+                android:id="@+id/progress_profile"
+                style="?android:attr/progressBarStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:visibility="invisible"/>
+
+            <ImageView
+                android:id="@+id/btn_change_image"
+                android:layout_alignBottom="@+id/img_profile"
+                android:layout_alignRight="@+id/img_profile"
+                android:layout_alignEnd="@+id/img_profile"
+                style="@style/profile_camera_btn_style" />
+            <!-- <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:drawableStart="@drawable/ic_camera"
+                android:background="@android:color/transparent"
+                android:layout_alignBottom="@+id/profile_image"
+                android:layout_alignRight="@+id/profile_image"
+                android:layout_alignEnd="@+id/profile_image"
+                android:gravity="center"
+                />-->
+
+        </RelativeLayout>
+
+    </RelativeLayout>
+    <android.support.v4.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true"
+        android:orientation="vertical">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+            <android.support.design.widget.TextInputLayout
+                android:id="@+id/input_layout_name"
+                style="@style/profile_input_layout_style">
+                <EditText
+                    android:id="@+id/et_name"
+                    style="@style/et_name_style" />
+            </android.support.design.widget.TextInputLayout>
+
+            <android.support.design.widget.TextInputLayout
+                android:id="@+id/input_layout_country"
+                style="@style/profile_input_layout_style">
+                <EditText
+                    android:id="@+id/et_country"
+                    style="@style/et_country_style" />
+            </android.support.design.widget.TextInputLayout>
+            <android.support.design.widget.TextInputLayout
+                android:id="@+id/input_layout_email"
+                style="@style/profile_input_layout_style">
+                <EditText
+                    android:id="@+id/et_emailid"
+                    style="@style/et_emai_lid_style" />
+            </android.support.design.widget.TextInputLayout>
+            <TextView
+                style="@style/btn_logout_style"
+                android:id="@+id/btn_logout"/>
+        </LinearLayout>
+    </android.support.v4.widget.NestedScrollView>
+</LinearLayout>
+

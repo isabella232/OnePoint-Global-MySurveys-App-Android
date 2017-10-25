@@ -1,0 +1,122 @@
+<android.support.v4.widget.NestedScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true"
+    android:layout_gravity="top"
+    android:orientation="vertical">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        tools:context="com.opg.my.surveys.Fragments.SettingsFragment">
+
+        <!-- TODO: Update blank fragment layout -->
+        <TextView
+            style="@style/tv_header_settings_style"
+            android:id="@+id/tv_header_settings"/>
+
+        <LinearLayout
+            android:id="@+id/container_change_panel"
+            style="@style/container_settings_default_style">
+            <TextView
+                style="@style/tv_default_settings_style"
+                android:text="@string/change_panel"  />
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/divider"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/geofence_layout_height"
+            style="@style/container_geo_location_style"
+            android:id="@+id/container_geo_location">
+
+            <TextView
+                style="@style/tv_geo_location_style"/>
+
+            <android.support.v7.widget.SwitchCompat
+                android:id="@+id/switch_geo_location"
+                style="@style/switch_geo_location_style"/>
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/divider">
+
+        </View>
+        <LinearLayout
+            android:id="@+id/container_change_password"
+            style="@style/container_settings_default_style">
+
+            <TextView
+                style="@style/tv_default_settings_style"
+                android:text="@string/change_password" />
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/divider">
+
+        </View>
+        <LinearLayout
+            android:id="@+id/container_privacy"
+            style="@style/container_settings_default_style">
+
+            <TextView
+                style="@style/tv_default_settings_style"
+                android:text="@string/privacy" />
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/divider">
+
+        </View>
+        <LinearLayout
+            android:id="@+id/container_terms_condition"
+            style="@style/container_settings_default_style">
+
+            <TextView
+                style="@style/tv_default_settings_style"
+                android:text="@string/terms_condition" />
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/divider">
+
+        </View>
+        <LinearLayout
+            android:id="@+id/container_about_us"
+            style="@style/container_settings_default_style">
+
+            <TextView
+                style="@style/tv_default_settings_style"
+                android:text="@string/about_us" />
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/divider">
+
+        </View>
+        <RelativeLayout
+            android:id="@+id/container_version"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <TextView
+                android:id="@+id/tv_version"
+                style="@style/tv_version_style"/>
+        </RelativeLayout>
+    </LinearLayout>
+</android.support.v4.widget.NestedScrollView>

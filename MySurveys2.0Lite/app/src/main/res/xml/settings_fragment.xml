@@ -1,0 +1,41 @@
+<PreferenceScreen
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout="@layout/test">
+    <PreferenceCategory
+        android:title="@string/title_settings">
+
+        <Preference
+            android:key="change_panel_preference"
+            android:title="@string/change_panel"
+            />
+        <SwitchPreferenceCompat
+            android:key="geo_checkbox_preference"
+            android:title="@string/geo_location"/>
+        <Preference
+            android:key="change_password_preference"
+            android:title="@string/change_password"
+
+            >
+        </Preference>
+        <Preference
+            android:key="privacy_preference"
+            android:title="@string/privacy"></Preference>
+        <Preference
+            android:key="terms_condition_preference"
+            android:title="@string/terms_condition"></Preference>
+        <Preference
+            android:key="about_us_preference"
+            android:title="@string/about_us"></Preference>
+        <Preference
+            android:key="version_preference"
+            android:layout="@layout/version_layout"
+
+            ></Preference>
+    </PreferenceCategory>
+<!--<PreferenceCategory
+    android:enabled="false"
+
+    >
+
+</PreferenceCategory>-->
+</PreferenceScreen>

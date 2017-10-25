@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:orientation="vertical"
+              android:baselineAligned="false">
+    <TextView
+        android:id="@+id/tv_title_panel"
+        style="@style/tv_title_panel_style"/>
+    <TextView
+        style="@style/tv_current_panel_style"
+        />
+    <TextView
+        style="@style/et_current_panel_name_style"
+        android:id="@+id/et_current_panel_name"/>
+    <View
+        style="@style/view_style"/>
+
+    <android.support.v7.widget.RecyclerView
+        style="@style/recycler_view_panel_style"
+        android:id="@+id/recycler_view_panel"/>
+
+</LinearLayout>

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#F79137</color>
+    <color name="colorPrimaryDark">#e67512</color>
+    <color name="colorAccent">@android:color/white</color>
+    <color name="bg_color">#FF4E4A4A</color>
+    <color name="survey_detail_top_bg">#757575</color>
+    <color name="divider_bg">#E2E2E2</color>
+    <color name="geofence_color">#14f19f5b</color>
+    <color name="geofence_border_color">#ed7811</color>
+    <color name="google_sign_in">#717171</color>
+    <!--Shimmering-->
+    <color name="preset_button_background">@android:color/transparent</color>
+    <color name="preset_button_background_selected">#66000000</color>
+    <color name="google_btn_background">#DD4B39</color>
+    <color name="facebook_btn_background">#3B5999</color>
+    <!--****************-->
+    <color name="black">#000000</color>
+    <color name="white">#FFFFFF</color>
+    <color name="btn_font_color">#F79137</color>
+    <color name="primary_text_color">#959595</color>
+    <color name="secondary_text_color">#b9b7b7</color><!--#E2E2E2-->
+    <color name="notification_selected">#b9b7b7</color><!--FFF1EFEF-->
+    <color name="sub_title_text_color">#b9b7b7</color><!--CFCFCF-->
+    <color name="progress_bg">#CFCFCF</color>
+    <color name="divider">#E2E2E2</color>
+    <color name="counter_grey">#C4C4C4</color>
+    <color name="selected_item">#FFEFEDED</color>
+    <!--Switch Colors-->
+    <color name="disable_foreground_gray">#42221F1F</color>
+    <color name="disable_thumb_gray">#F1F1F1F1</color>
+    <color name="enable_thumb_green">#46BDBF</color>
+ </resources>

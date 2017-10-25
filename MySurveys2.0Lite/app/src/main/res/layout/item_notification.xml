@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/container_notification_item"
+    style="@style/container_notification_item_style">
+
+    <ImageView
+        android:id="@+id/notification_image_view"
+        android:layout_alignParentLeft="true"
+        android:layout_centerVertical="true"
+        style="@style/notification_image_view_style"/>
+
+    <TextView
+        android:id="@+id/notification_title_tv"
+        android:layout_centerVertical="true"
+        android:layout_toRightOf="@+id/notification_image_view"
+        android:ellipsize="end"
+        style="@style/notification_title_tv_style" />
+    <!--android:layout_toEndOf="@+id/notification_image_view"-->
+</RelativeLayout>
