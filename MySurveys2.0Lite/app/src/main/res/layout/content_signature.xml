@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context="com.opg.my.surveys.SignatureActivity"
+    tools:showIn="@layout/activity_signature">
+    <LinearLayout
+        style="@style/signature_btn_lay_sty"
+        android:layout_alignParentTop="true"
+        android:id="@+id/sigBtnLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:weightSum="3">
+
+        <ImageView
+            style="@style/signature_action_btn_sty"
+            android:id="@+id/clear"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="@string/clear"
+            android:src="@drawable/reload_icon" />
+
+        <ImageView
+            style="@style/signature_action_btn_sty"
+            android:id="@+id/getsign"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="@string/title_save_profile"
+            android:src="@drawable/tick_icon" />
+
+        <ImageView
+            style="@style/signature_action_btn_sty"
+            android:id="@+id/cancel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="@android:string/cancel"
+            android:src="@drawable/cancel_icon"/>
+
+    </LinearLayout>
+
+    <RelativeLayout
+        android:layout_centerHorizontal="true"
+        android:layout_below="@+id/sigBtnLayout"
+        android:id="@+id/canvasLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/signature_bg"
+        style="@style/signature_canvas_layout_style" />
+</RelativeLayout>
