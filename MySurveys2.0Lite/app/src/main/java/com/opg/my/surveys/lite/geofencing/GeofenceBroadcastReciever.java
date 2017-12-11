@@ -16,7 +16,8 @@ public class GeofenceBroadcastReciever extends WakefulBroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        if(intent.getAction().equalsIgnoreCase(GeofenceIntentService.ACTION_ENTER)){
+        if(intent.getAction().equalsIgnoreCase(GeofenceIntentService.ACTION_ENTER) || intent.getAction().equalsIgnoreCase(GeofenceIntentService.ACTION_EXIT))
+        {
             ComponentName comp = new ComponentName(context.getPackageName(),
                     GeofenceIntentService.class.getName());
 

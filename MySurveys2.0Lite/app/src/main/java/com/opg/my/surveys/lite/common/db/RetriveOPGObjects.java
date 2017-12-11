@@ -92,7 +92,7 @@ public class RetriveOPGObjects {
                     opgSurvey.setDescription(survey.getDescription());
                     opgSurvey.setScriptID(survey.getScriptID());
                     opgSurvey.setStatus(survey.getStatus());
-                    opgSurvey.setSurveyReference(survey.getSearchTags());//we are usng searchtags as surveyreference
+                    opgSurvey.setSurveyReference(survey.getsurveyReference());
                     opgSurvey.setSurveyID(survey.getSurveyID());
                     opgSurvey.setCreatedDate(survey.getCreatedDate());
                     opgSurvey.setLastUpdatedDate(survey.getLastUpdatedDate());
@@ -367,7 +367,7 @@ public class RetriveOPGObjects {
             opgSurvey.setStatus(survey.getStatus() == null ? Util.NEW_STATUS_KEY : survey.getStatus());
         }
 
-        opgSurvey.setSurveyReference(survey.getSearchTags());//we are using search tags as survey reference
+        opgSurvey.setSurveyReference(survey.getsurveyReference());
         opgSurvey.setSurveyID(survey.getSurveyID());
         opgSurvey.setCreatedDate(survey.getCreatedDate());
         opgSurvey.setLastUpdatedDate(survey.getLastUpdatedDate());
@@ -406,7 +406,10 @@ public class RetriveOPGObjects {
                     opgGeofenceSurvey.setLastUpdatedDate(survey.getLastUpdatedDate());
                     opgGeofenceSurvey.setRange(survey.getRange());
                     opgGeofenceSurvey.setDistance(survey.getDistance());
-                    opgGeofenceSurvey.setDeleted(survey.getIsEntered());//using the value of isDeleted for isEntered
+                    opgGeofenceSurvey.setEntered(survey.getIsEntered());
+                    opgGeofenceSurvey.setExit(survey.getIsExit());
+                    opgGeofenceSurvey.setEnter(survey.getIsEnter());
+                    opgGeofenceSurvey.setTimeInterval(survey.getGeofenceTimeInterval());
                     opgGeofenceSurveyList.add(opgGeofenceSurvey);
                 }
             }

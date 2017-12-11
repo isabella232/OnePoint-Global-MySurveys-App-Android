@@ -1,1 +1,1 @@
-include ':app', ':opgdbhelper-new', ':opgsdk_lite_v1.7'
+include ':app', ':opgdbhelper', ':opgsdk_lite_v1.7'

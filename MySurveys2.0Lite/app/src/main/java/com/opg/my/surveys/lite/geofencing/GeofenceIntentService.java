@@ -58,10 +58,18 @@ public class GeofenceIntentService extends IntentService {
     protected void onHandleIntent(Intent intent) {
         if (intent != null) {
             final String action = intent.getAction();
-            if (ACTION_ENTER.equals(action)) {
+            if (ACTION_ENTER.equals(action) || ACTION_EXIT.equals(action) /*|| ACTION_DWELL.equals(action)*/) {
                 if(BuildConfig.DEBUG) {
                     Log.i("GeofenceIntentTriggered", "com.opg.sdk.transistion.enter");
                 }
+               /* String transistionType = "";
+                if(ACTION_ENTER.equals(action)){
+                    transistionType = "Entered survey location of ";
+                }else  if(ACTION_EXIT.equals(action)){
+                    transistionType = "Exited survey location of ";
+                }else  if(ACTION_DWELL.equals(action)){
+                    transistionType = "Present in survey location of ";
+                }*/
 
                 List<OPGGeofenceSurvey> newSurveys = Util.convertStringToOPGGeofenceList(intent.getStringExtra("triggeredGeofences"));
                 if(BuildConfig.DEBUG) {
@@ -71,19 +79,45 @@ public class GeofenceIntentService extends IntentService {
                 for (OPGGeofenceSurvey opgGeofenceSurvey:newSurveys){
                     stringBuilder.setLength(0);
                     try {
-                        stringBuilder.append(getString(R.string.welcome_to)).append(" ").append(opgGeofenceSurvey.getAddress());
-                        stringBuilder.append(getString(R.string.geofence_noti_msg));
-                        String notification_message = stringBuilder.toString();
-                        JSONObject notificationJSON = new JSONObject();
-                        notificationJSON.put("title",stringBuilder.toString());
-                        stringBuilder.append("\n\nAddress:").append(opgGeofenceSurvey.getAddress());
-                        notificationJSON.put("alert",stringBuilder.toString());
-                        notificationJSON.put("SurveyRef",opgGeofenceSurvey.getSurveyReference());
-                        boolean status = SaveOPGObjects.storeNotification(notificationJSON.toString());
-                        if(BuildConfig.DEBUG)
-                            Log.e("App Notifications Count",status+ "- "+ RetriveOPGObjects.getNotificationList());
-                        pushNotification(notification_message);
-                        notification_message = null;
+                        //  stringBuilder.append("Action").append(" : ").append(action).append("\n");
+
+                        if((ACTION_ENTER.equals(action) && opgGeofenceSurvey.isEnter())||(ACTION_EXIT.equals(action) && opgGeofenceSurvey.isExit()))
+                        {
+                            stringBuilder.append(opgGeofenceSurvey.getSurveyName()).append("\n");
+                            if(ACTION_ENTER.equals(action) && opgGeofenceSurvey.isEnter())
+                            {
+                                stringBuilder.append(getString(R.string.welcome_to)).append(" ").append(opgGeofenceSurvey.getAddress()).append("\n");
+                                stringBuilder.append(getString(R.string.geofence_noti_msg));
+                            }else if(ACTION_EXIT.equals(action))
+                            {
+                                stringBuilder.append(getString(R.string.thank_you_for_visiting)).append(" ").append(opgGeofenceSurvey.getAddress()).append("\n");
+                                stringBuilder.append(getString(R.string.survey_available));
+                            }
+                            String notification_message = stringBuilder.toString();
+                            JSONObject notificationJSON = new JSONObject();
+                            notificationJSON.put("title",stringBuilder.toString());
+                            // stringBuilder.append("\n\nAddress:").append(opgGeofenceSurvey.getAddress());
+                            notificationJSON.put("alert",stringBuilder.toString());
+                            notificationJSON.put("SurveyRef",opgGeofenceSurvey.getSurveyReference());
+                            if(BuildConfig.DEBUG) {
+                                Log.i("GeofenceIntentTriggered", "NotificationMessage"+notification_message);
+                            }
+                            updateDb(notificationJSON);
+                            pushNotification(notification_message);
+
+                        }
+
+
+                        /*if(ACTION_ENTER.equals(action) && opgGeofenceSurvey.isEnter())
+                        {
+                            pushNotification(notification_message);
+                            updateDb(notificationJSON);
+                        }else if(ACTION_EXIT.equals(action) && opgGeofenceSurvey.isExit())
+                        {
+                            pushNotification(notification_message);
+                            updateDb(notificationJSON);
+                        }
+                        notification_message = null;*/
                     } catch (Exception e) {
                         if(BuildConfig.DEBUG) {
                             e.printStackTrace();
@@ -95,7 +129,20 @@ public class GeofenceIntentService extends IntentService {
         }
         GeofenceBroadcastReciever.completeWakefulIntent(intent);
     }
-
+    private void updateDb(JSONObject notificationJSON)
+    {
+        boolean status ;
+        try {
+            status = SaveOPGObjects.storeNotification(notificationJSON.toString());
+        }catch (Exception exception){
+            try {
+                status = SaveOPGObjects.storeNotification(notificationJSON.toString());
+            }catch (Exception exc){
+                if(BuildConfig.DEBUG)
+                    Log.e("GeofenceIntentTriggered","Exception1:"+exc.toString());
+            }
+        }
+    }
     public void pushNotification(final String message)
     {
         if(BuildConfig.DEBUG) {

@@ -452,11 +452,14 @@ public class LoginActivity extends RootActivity implements View.OnClickListener,
 
     private void sdkInitialize() throws Exception
     {
+
+        OPGSDK.initialize("neeraj","c1d406e7-a3d6-457b-9eb1-c6c24df93de9",getApplicationContext());
+        Util.getOPGSDKInstance().setAppVersion("MySurveysApp-ANDROID-2.0.2-A", getApplicationContext());
         //plz enter the admin name and shared key of your account on OnePoint website
         //https://account.onepointglobal.com/#/login
-        OPGSDK.initialize("*****","*******",getApplicationContext());
+        //OPGSDK.initialize("*****","*******",getApplicationContext());
         //pass the required app version
-        Util.getOPGSDKInstance().setAppVersion("****", getApplicationContext());
+        //Util.getOPGSDKInstance().setAppVersion("****", getApplicationContext());
     }
 
     @Override

@@ -54,6 +54,8 @@
     <string name="geofence_survey_panel_error">Selected survey is not under current Panel. Please change the panel to take survey!</string>
     <string name="welcome_message_survey">Welcome! You have a survey here!</string>
     <string name="survey_range_error">You are not in this location to take the survey!</string>
+    <string name="thank_you_for_visiting">Thank You for visiting</string>
+    <string name="survey_available">You have survey available.</string>
     <!--Survey Details Page *********************-->
     <string name="zero_str" translatable="false">0</string>
 

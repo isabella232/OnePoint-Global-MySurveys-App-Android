@@ -20,6 +20,7 @@ public class MySurveysPreference
 {
     private final static String PREFS_NAME = "OnePointPreference";
     private final static String SCRIPT_PREFS_NAME = "OnePointScriptPreference";
+    private final static String GEOFENC_PREFS_NAME = "GeofencePreference";
 
     private final static String IS_USER_LOGGED_IN ="isUserLoggedIn";
     private final static String LOGIN_TYPE  ="loginType";
@@ -48,6 +49,7 @@ public class MySurveysPreference
     private final static String HEADER_MEDIA_ID = "HeaderMediaID";
     private final static String LOGO_TEXT = "LogoText";
     private final static String LAST_LOCATION_KNOWN = "lastLocationKnown";
+    private final static String IS_GEOFENCE_SURVEY_ENABLED = "isSurveyGeofenceEnabled";
 
 
 
@@ -617,5 +619,21 @@ public class MySurveysPreference
     {
         return getProperty(context,LAST_LOCATION_KNOWN,"");
     }
+    public static void setGeofenceSurveyEnabled(Context context, String SurveyRef,boolean isEnabled)
+    {
+        if(context != null)
+        {
+            context.getSharedPreferences(GEOFENC_PREFS_NAME, Context.MODE_PRIVATE).edit().putBoolean(IS_GEOFENCE_SURVEY_ENABLED+":"+SurveyRef, isEnabled).commit();
+        }
+    }
 
+    public static boolean isGeofenceSurveyEnabled(Context context,String SurveyRef)
+    {
+        return    context.getSharedPreferences(GEOFENC_PREFS_NAME, Context.MODE_PRIVATE).getBoolean(IS_GEOFENCE_SURVEY_ENABLED+":"+SurveyRef, false);
+    }
+
+    public static void clearEnabledSurveys(Context context)
+    {
+        context.getSharedPreferences(GEOFENC_PREFS_NAME, Context.MODE_PRIVATE).edit().clear().commit();
+    }
 }
