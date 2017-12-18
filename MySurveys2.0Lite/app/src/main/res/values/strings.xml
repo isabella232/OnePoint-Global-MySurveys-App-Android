@@ -54,6 +54,8 @@
     <string name="geofence_survey_panel_error">Selected survey is not under current Panel. Please change the panel to take survey!</string>
     <string name="welcome_message_survey">Welcome! You have a survey here!</string>
     <string name="survey_range_error">You are not in this location to take the survey!</string>
+    <string name="thank_you_for_visiting">Thank You for visiting</string>
+    <string name="survey_available">You have survey available.</string>
     <!--Survey Details Page *********************-->
     <string name="zero_str" translatable="false">0</string>
 
@@ -144,6 +146,18 @@
     <string name="gallery_permission" translatable="false">This lets My Surveys to store and access information like photos on your phone and it\'s SD Card.</string>
     <string name="location_permission" translatable="false">We need to access your location in order to display location based survey.</string>
     <string name="allow" translatable="false">allow</string>
+
+    <!--Runtime Permissions -->
+    <string name="storage_permission_msg" translatable="false">Requires storage permissions to take the survey.As the survey needs to access the files, photos etc.</string>
+    <string name="access_permission_msg" translatable="false">Requires storage permissions to access the files, photos ,videos etc.</string>
+    <string name="location_permission_msg" translatable="false">Requires location permission to access the location.</string>
+    <string name="camera_permission_msg" translatable="false">Requires camera permission to capture an image.</string>
+    <string name="audio_permission_msg" translatable="false">Requires record audio permission to record the audio.</string>
+    <string name="record_permission_msg" translatable="false">Requires camera and audio permissions to record the video.</string>
+    <string name="app_settings" translatable="false">App Settings</string>
+    <string name="activate_storage_msg" translatable="false">Activate storage under the permissions menu.</string>
+    <string name="deny" translatable="false">Deny</string>
+
     <!--Geofencing Strings -->
     <string name="gps_network_not_enabled">Location services not enabled.Please enable it.</string>
     <string name="open_location_settings">Location Settings</string>
@@ -159,8 +173,10 @@
     <string name="err_upload_survey_failed">Results upload failed</string>
     <string name="success_results_uploaded">Results are Uploaded</string>
 
-    <string name="reason_str">Reason:</string>
+    <string name="reason_str" >Reason:</string>
     <string name="session_expired_login_again" translatable="false">Session expired.Please login again</string>
-
+    <string name="clear" translatable="false">Clear</string>
+    <string name="sign_here_title" translatable="false">Please sign here</string>
+    <string name="title_activity_signature" translatable="false">Signature</string>
 
 </resources>

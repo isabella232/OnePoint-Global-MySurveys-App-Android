@@ -113,7 +113,31 @@ public class MySurveys extends MultiDexApplication {
         }
         return opgGeofenceSurveys;
     }
+    /**
+     * It will check the given list has the opggeofencesurvey object or not.If it there we will change the status is deleted to the assigned value.
+     * Here isdeleted is used as isEntered variable.It says whether the user entered the survey location or not.
+     * @param
+     * @param
+     * @return
+     */
+    public static List<OPGGeofenceSurvey> updateOPGGeofenceSurveys(OPGGeofenceSurvey triggeredSurvey, boolean isEntered/*, boolean isEnable*/) throws Exception {
+        List<OPGGeofenceSurvey> opgGeofenceSurveys = RetriveOPGObjects.getOPGGeofenceSurveys();//Getting the main geofence list from db
+        if(opgGeofenceSurveys != null && opgGeofenceSurveys.size() >= 0  )
+        {
+            for (OPGGeofenceSurvey opgGeofenceSurvey1 : opgGeofenceSurveys)
+            {
 
+                if(opgGeofenceSurvey1.getAddressID() == triggeredSurvey.getAddressID() && triggeredSurvey.getSurveyID() == opgGeofenceSurvey1.getSurveyID()) {
+
+                    opgGeofenceSurvey1.setEntered(isEntered);
+                    Boolean status = UpdateOPGObjects.updateOPGGeofenceSurveyStatus(opgGeofenceSurvey1.getAddressID(),opgGeofenceSurvey1.getSurveyID(),isEntered/*,isEnable*/);
+                    if(BuildConfig.DEBUG)
+                        System.out.println("Update Status: "+isEntered);
+                }
+            }
+        }
+        return opgGeofenceSurveys;
+    }
     public static void clearHashMaps(){
 
     }

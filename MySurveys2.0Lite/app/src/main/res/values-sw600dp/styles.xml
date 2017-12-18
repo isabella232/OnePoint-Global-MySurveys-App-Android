@@ -1128,4 +1128,21 @@
         <item name="android:textSize">@dimen/secondary_text_size</item>
     </style>
 
+    <!-- Styles related to the signature layout -->
+    <style name="signature_canvas_layout_style">
+        <item name="android:padding">1dp</item>
+        <item name="android:layout_marginTop">22dp</item>
+        <item name="android:layout_marginBottom">85dp</item>
+        <item name="android:layout_marginLeft">50dp</item>
+        <item name="android:layout_marginRight">50dp</item>
+    </style>
+    <style name="signature_btn_lay_sty">
+        <item name="android:layout_marginTop">25dp</item>
+    </style>
+    <style name="signature_action_btn_sty">
+        <item name="android:layout_marginLeft">30dp</item>
+        <item name="android:layout_marginRight">30dp</item>
+        <item name="android:padding">30dp</item>
+        <item name="android:layout_weight">1</item>
+    </style>
 </resources>

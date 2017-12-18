@@ -445,6 +445,7 @@ public class HomeActivity extends AppCompatActivity implements OPGGeofenceTrigge
      * Called when we are refreshing the db
      */
     private void onRefresh() {
+        MySurveysPreference.clearEnabledSurveys(this);
         if (!Util.isServiceRunning(mContext , FetchDataService.class)) {
             refreshAnimationStart();
                 refreshData();
@@ -694,7 +695,7 @@ public class HomeActivity extends AppCompatActivity implements OPGGeofenceTrigge
         if(BuildConfig.DEBUG)
             System.out.println("Location:"+location.getLatitude()+"\n List Size:"+list.size());
         try {
-            MySurveys.updateOPGGeofenceSurveys(list,true);
+            //MySurveys.updateOPGGeofenceSurveys(list,true);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -706,23 +707,13 @@ public class HomeActivity extends AppCompatActivity implements OPGGeofenceTrigge
         if(BuildConfig.DEBUG)
             System.out.println("Location:"+location.getLatitude()+"\n List Size:"+list.size());
         try {
-            MySurveys.updateOPGGeofenceSurveys(list,false);
+           // MySurveys.updateOPGGeofenceSurveys(list,false);
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    //Triggered when the device present in any particular geofence areas
-    @Override
-    public void didDwellSurveyRegion(Location location, List<OPGGeofenceSurvey> list) {
-        if(BuildConfig.DEBUG)
-            System.out.println("Location:"+location.getLatitude()+"\n List Size:"+list.size());
-        try {
-            MySurveys.updateOPGGeofenceSurveys(list,true);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
+
 
     @Override
     public void onConnected(@Nullable Bundle bundle) {

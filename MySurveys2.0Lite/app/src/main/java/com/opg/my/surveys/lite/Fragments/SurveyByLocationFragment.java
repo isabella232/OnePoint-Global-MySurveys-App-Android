@@ -106,16 +106,23 @@ public class SurveyByLocationFragment extends Fragment implements OnMapReadyCall
                     if (intent.getAction().equalsIgnoreCase(Util.BROADCAST_ACTION_GEOFENCES_UPDATED)) {
                         plotSurveys();
                         updateMainViews();
-                    } else if (intent.getAction().equalsIgnoreCase(Util.BROADCAST_GEOFENCE_TRANSITION_ENTER) || intent.getAction().equalsIgnoreCase(Util.BROADCAST_GEOFENCE_TRANSITION_EXIT)
-                            || intent.getAction().equalsIgnoreCase(Util.BROADCAST_GEOFENCE_TRANSITION_DWELL)) {
-
+                    } else if (intent.getAction().equalsIgnoreCase(Util.BROADCAST_GEOFENCE_TRANSITION_ENTER) ||
+                            intent.getAction().equalsIgnoreCase(Util.BROADCAST_GEOFENCE_TRANSITION_EXIT))
+                    {
                         List<OPGGeofenceSurvey> newSurveys = Util.convertStringToOPGGeofenceList(intent.getStringExtra("triggeredGeofences"));
-                        if (intent.getAction().equalsIgnoreCase(Util.BROADCAST_GEOFENCE_TRANSITION_ENTER) || intent.getAction().equalsIgnoreCase(Util.BROADCAST_GEOFENCE_TRANSITION_DWELL)) {
-                            notificationSurveys = MySurveys.addAvaliableOPGGeofenceSurveys(notificationSurveys, newSurveys);
-                            showSurveyMessageDialog();
-                        } else {
-                            notificationSurveys = MySurveys.removeOPGGeofenceSurveys(notificationSurveys, newSurveys);
+
+                        for(OPGGeofenceSurvey survey : newSurveys)
+                        {
+                            if(intent.getAction().equalsIgnoreCase(Util.BROADCAST_GEOFENCE_TRANSITION_ENTER) && survey.isEnter())
+                            {
+                                notificationSurveys.add(survey);
+                            }else if(intent.getAction().equalsIgnoreCase(Util.BROADCAST_GEOFENCE_TRANSITION_EXIT) && survey.isExit())
+                            {
+                                notificationSurveys.add(survey);
+                            }
                         }
+                        showSurveyMessageDialog();
+                        plotSurveys();
                         updateMainViews();
                     }
                 } catch (Exception e) {
@@ -454,17 +461,33 @@ public class SurveyByLocationFragment extends Fragment implements OnMapReadyCall
         if (geofenceAlert != null && geofenceAlert.isShowing()) {
             return;
         }
-        if (notificationSurveys.size() > 0 && getUserVisibleHint()) {
+        if (notificationSurveys.size() > 0 && getUserVisibleHint())
+        {
             final OPGGeofenceSurvey opgGeofenceSurvey = notificationSurveys.get(0);
-            if (checkSurveyIsPanelSurvey(opgGeofenceSurvey)) {
+            if (checkSurveyIsPanelSurvey(opgGeofenceSurvey))
+            {
                 try {
-                    OPGSurvey survey = RetriveOPGObjects.getSurvey(opgGeofenceSurvey.getSurveyID());
+                    //OPGSurvey survey = RetriveOPGObjects.getSurvey(opgGeofenceSurvey.getSurveyID());
                     notificationSurveys.remove(opgGeofenceSurvey);
                     geofenceAlert = new Dialog(getActivity());
                     geofenceAlert.requestWindowFeature(Window.FEATURE_NO_TITLE);
                     geofenceAlert.setContentView(R.layout.dialog_logout);
+
                     StringBuilder stringBuilder = new StringBuilder();
-                    stringBuilder.append(getString(R.string.enter_survey_location)).append(survey.getName()).append("\n\n").append(opgGeofenceSurvey.getAddress());
+                    stringBuilder.append(opgGeofenceSurvey.getSurveyName()).append("\n\n");
+                    if(opgGeofenceSurvey.isEnter())
+                    {
+
+                        stringBuilder.append(getString(R.string.enter_survey_location))./*append(survey.getName()).*/append("\n\n").append(opgGeofenceSurvey.getAddress());
+                        stringBuilder.append(getString(R.string.geofence_noti_msg));
+                    }
+                    else if(opgGeofenceSurvey.isExit())
+                    {
+                        stringBuilder.append(getString(R.string.thank_you_for_visiting)).append(" ").append(opgGeofenceSurvey.getAddress()).append("\n");
+                        stringBuilder.append(getString(R.string.survey_available));
+                    }
+
+
                     ((TextView) geofenceAlert.findViewById(R.id.tv_title_logout_dialog)).setText(stringBuilder.toString());
                     Button btncancel = (Button) geofenceAlert.findViewById(R.id.btn_cancel_logout);
                     Button btnTakeSurvey = (Button) geofenceAlert.findViewById(R.id.btn_confirm_logout);

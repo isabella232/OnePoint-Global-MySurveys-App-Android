@@ -126,7 +126,18 @@
             android:windowSoftInputMode="adjustPan" />
 
         <service android:name=".LocationService" />
+        <activity
+            android:name=".SignatureActivity"
+            android:label="@string/title_activity_signature"
+            android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize"
+            android:windowSoftInputMode="adjustPan"
+            android:theme="@style/AppTheme">
+            <intent-filter>
+                <action android:name="com.opg.my.surveys.SIGNATURE"/>
 
+                <category android:name="android.intent.category.DEFAULT"/>
+            </intent-filter>
+        </activity>
     </application>
 
 </manifest>

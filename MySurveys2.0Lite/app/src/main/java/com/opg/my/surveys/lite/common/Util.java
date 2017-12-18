@@ -125,9 +125,9 @@ public class Util
 
 
 
-    public static String BROADCAST_GEOFENCE_TRANSITION_ENTER = "com.opg.sdk.transition.enter";
-    public static String BROADCAST_GEOFENCE_TRANSITION_EXIT  = "com.opg.sdk.transition.exit";
-    public static String BROADCAST_GEOFENCE_TRANSITION_DWELL  = "com.opg.sdk.transition.dwell";
+    public static String BROADCAST_GEOFENCE_TRANSITION_ENTER = "com.opg.my.surveys.lite.transition.enter";
+    public static String BROADCAST_GEOFENCE_TRANSITION_EXIT  = "com.opg.my.surveys.lite.transition.exit";
+    public static String BROADCAST_GEOFENCE_TRANSITION_DWELL = "com.opg.my.surveys.lite.transition.dwell";
 
     public static String RESTART_GEOFENCING = "restartGeofencing";
 

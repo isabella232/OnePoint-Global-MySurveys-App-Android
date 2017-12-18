@@ -90,7 +90,7 @@ public class SaveOPGObjects {
 
         //Need to replace the searchTags with surveyreference
         try {
-            survey.setSearchTags((opgSurvey.getSurveyReference().equalsIgnoreCase("null")) ? ""
+            survey.setsurveyReference((opgSurvey.getSurveyReference().equalsIgnoreCase("null")) ? ""
                     : opgSurvey.getSurveyReference().replace("'", "''"));
         } catch (Exception e) {
             survey.setSearchTags("");
@@ -511,14 +511,17 @@ public class SaveOPGObjects {
         geofenceSurvey.setLastUpdatedDate(survey.getLastUpdatedDate());
         geofenceSurvey.setRange(survey.getRange());
         geofenceSurvey.setDistance((long)survey.getDistance());
-        geofenceSurvey.setIsEntered(survey.isDeleted());//using the value of isDeleted for isEntered
+        geofenceSurvey.setIsEntered(survey.isEntered());
+        geofenceSurvey.setIsExit(survey.isExit());
+        geofenceSurvey.setIsEnter(survey.isEnter());
+        if(!survey.isEnter() && !survey.isExit() )
+        {
+            geofenceSurvey.setIsEnter(true);
+        }
+        geofenceSurvey.setGeofenceTimeInterval(survey.getTimeInterval());
         geofenceSurvey.setIsNew(true);
 
         Boolean status = factory.save(geofenceSurvey);
-        if(BuildConfig.DEBUG) {
-            System.out.print("VStatusV1:" + survey.isDeleted());
-            System.out.print("VStatusV:" + status);
-        }
         return status;
     }
 
