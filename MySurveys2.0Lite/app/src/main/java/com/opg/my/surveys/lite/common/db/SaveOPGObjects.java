@@ -10,6 +10,7 @@ import com.opg.pom.model.CountryFactory;
 import com.opg.pom.model.ICountry;
 import com.opg.pom.model.IPanel;
 import com.opg.pom.model.IPanelPanellist;
+import com.opg.pom.model.IPanellistProfile;
 import com.opg.pom.model.ITheme;
 import com.opg.pom.model.Panel;
 import com.opg.pom.model.PanelFactory;
@@ -90,7 +91,7 @@ public class SaveOPGObjects {
 
         //Need to replace the searchTags with surveyreference
         try {
-            survey.setSearchTags((opgSurvey.getSurveyReference().equalsIgnoreCase("null")) ? ""
+            survey.setsurveyReference((opgSurvey.getSurveyReference().equalsIgnoreCase("null")) ? ""
                     : opgSurvey.getSurveyReference().replace("'", "''"));
         } catch (Exception e) {
             survey.setSearchTags("");
@@ -133,7 +134,12 @@ public class SaveOPGObjects {
             survey.setMediaID(-1);
         }
 
-        CSList<ISurvey> list = factory.findBySurveyID(survey.getSurveyID());
+        CSList<ISurvey> list ;
+        try{
+            list = factory.findBySurveyID(survey.getSurveyID());
+        }catch (Exception e){
+            list = factory.findBySurveyID(survey.getSurveyID());
+        }
         if (list.size() > 0) {
             survey.setIsNew(false);
         } else {
@@ -175,12 +181,43 @@ public class SaveOPGObjects {
 
         theme.setLastUpdatedDate(opgTheme.getLastUpdatedDate());
 
-        CSList<ITheme> list = themeFactory.findByThemeID(theme.getThemeID());
+        CSList<ITheme> list;
+
+        try{
+            list = themeFactory.findByThemeID(theme.getThemeID());
+        }catch(Exception ex){
+            list = themeFactory.findByThemeID(theme.getThemeID());
+        }
+
         if (list.size() > 0) {
             theme.setIsNew(false);
         } else {
             theme.setIsNew(true);
         }
+        /*
+        theme.setCreatedDate(Utils.convertToDateFromUTC(opgTheme.get("CreatedDate").toString()));
+        theme.setLastUpdatedDate(Utils.convertToDateFromUTC(obj.get("LastUpdatedDate").toString()));
+        */
+        /*if (OPGSharedPreference.getCheckForUpdatesPlugin((Activity) OPGApplication.getActivityContext())) {
+            LogManager.getLogger(OPGJsonToModelParser.class).debug("PARSER - Theme: CHECK FOR UPDATE.");
+            // TODO: check the last updated date and insert or update.
+            CSList<ITheme> list = themeFactory.findByThemeID(theme.getThemeID());
+            if (list.size() > 0) {
+                Date dbLastUpdated = list.get(0).getCreatedDate();
+                Date nwLastUpdated = theme.getCreatedDate();
+                boolean needUpdate = (dbLastUpdated.compareTo(nwLastUpdated) < 0);
+                if (needUpdate) {
+                    theme.setIsNew(false);
+                    themeFactory.save(theme);
+                }
+            } else {
+                themeFactory.save(theme);
+            }
+        } else {
+            LogManager.getLogger(OPGJsonToModelParser.class).debug("PARSER - Theme: NORMAL");
+            themeFactory.save(theme);
+        }*/
+
         return themeFactory.save(theme);
     }
 
@@ -211,8 +248,12 @@ public class SaveOPGObjects {
         pp.setLastUpdatedDate(opgPanelPanellist.getLastUpdatedDate());
 
         pp.setIsDeleted(opgPanelPanellist.isDeleted());
-
-        CSList<IPanelPanellist> list = panelPanellistFactory.findByPanelPanellistID(pp.getPanelPanellistID());
+        CSList<IPanelPanellist> list;
+        try {
+            list = panelPanellistFactory.findByPanelPanellistID(pp.getPanelPanellistID());
+        }catch (Exception e){
+            list = panelPanellistFactory.findByPanelPanellistID(pp.getPanelPanellistID());
+        }
         if(list.size()>0){
             pp.setIsNew(false);
         }else{
@@ -247,7 +288,7 @@ public class SaveOPGObjects {
         //save logo URl in SearchTag column of panels Table
         //if(opgPanel.getLogoUrl() != null)
         {
-            panel. setSearchTag(opgPanel.getLogoUrl());
+            panel.setSearchTag(opgPanel.getLogoUrl());
         }
 
         //Save logoID to remark
@@ -280,8 +321,12 @@ public class SaveOPGObjects {
         panel.setLastUpdatedDate(opgPanel.getLastUpdatedDate());
 
 
-
-        CSList<IPanel> list = panelFactory.findByPanelID(panel.getPanelID());
+        CSList<IPanel> list;
+        try{
+            list = panelFactory.findByPanelID(panel.getPanelID());
+        }catch (Exception e){
+            list = panelFactory.findByPanelID(panel.getPanelID());
+        }
         if (list.size() > 0) {
             panel.setIsNew(false);
         } else {
@@ -324,7 +369,13 @@ public class SaveOPGObjects {
         sp.setSurveyPanelID(String.valueOf(opgSurveyPanel.getSurveyPanelID()).equalsIgnoreCase("null") ? -1
                 : opgSurveyPanel.getSurveyPanelID());
 
-        CSList<ISurveyPanel> list = surveyPanelFactory.findBySurveyPanelID(sp.getSurveyPanelID());
+        CSList<ISurveyPanel> list;
+        try {
+            list = surveyPanelFactory.findBySurveyPanelID(sp.getSurveyPanelID());
+        }catch (Exception e){
+            list = surveyPanelFactory.findBySurveyPanelID(sp.getSurveyPanelID());
+
+        }
         if (list.size() > 0) {
             sp.setIsNew(false);
         } else {
@@ -410,7 +461,14 @@ public class SaveOPGObjects {
         profile.setPasswordEncrypted("@LDJDKLJ");
         profile.setTermsCondition(true);
 
-        if( factory.findAllObjects().size() > 0 && factory.findAllObjects().get(0).getPanellistID() == profile.getPanellistID()){
+        CSList<IPanellistProfile> list;
+        try{
+            list = factory.findAllObjects();
+        }catch (Exception e){
+            list = factory.findAllObjects();
+        }
+
+        if( list.size() > 0 && list.get(0).getPanellistID() == profile.getPanellistID()){
             profile.setIsNew(false);
         }else{
             profile.setIsNew(true);
@@ -434,7 +492,12 @@ public class SaveOPGObjects {
         country.setCreditRate((float) opgCountry.getCreditRate());
         country.setIsDeleted(opgCountry.isDeleted());
         country.setGmt(opgCountry.getGmt());
-        CSList<ICountry> list = factory.findByCountryID(opgCountry.getCountryID());
+        CSList<ICountry> list;
+        try{
+            list = factory.findByCountryID(opgCountry.getCountryID());
+        }catch (Exception e){
+            list = factory.findByCountryID(opgCountry.getCountryID());
+        }
         if(!list.isEmpty()){
             country.setIsNew(false);
         }else{
@@ -511,14 +574,17 @@ public class SaveOPGObjects {
         geofenceSurvey.setLastUpdatedDate(survey.getLastUpdatedDate());
         geofenceSurvey.setRange(survey.getRange());
         geofenceSurvey.setDistance((long)survey.getDistance());
-        geofenceSurvey.setIsEntered(survey.isDeleted());//using the value of isDeleted for isEntered
+        geofenceSurvey.setIsEntered(survey.isEntered());
+        geofenceSurvey.setIsExit(survey.isExit());
+        geofenceSurvey.setIsEnter(survey.isEnter());
+        if(!survey.isEnter() && !survey.isExit() )
+        {
+            geofenceSurvey.setIsEnter(true);
+        }
+        geofenceSurvey.setGeofenceTimeInterval(survey.getTimeInterval());
         geofenceSurvey.setIsNew(true);
 
         Boolean status = factory.save(geofenceSurvey);
-        if(BuildConfig.DEBUG) {
-            System.out.print("VStatusV1:" + survey.isDeleted());
-            System.out.print("VStatusV:" + status);
-        }
         return status;
     }
 

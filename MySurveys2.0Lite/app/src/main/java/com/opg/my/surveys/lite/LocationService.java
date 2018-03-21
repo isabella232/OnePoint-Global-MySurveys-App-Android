@@ -35,12 +35,14 @@ import com.opg.my.surveys.lite.common.Util;
 import com.opg.my.surveys.lite.common.db.RetriveOPGObjects;
 import com.opg.my.surveys.lite.common.db.SaveOPGObjects;
 import com.opg.my.surveys.lite.common.db.UpdateOPGObjects;
+import com.opg.my.surveys.lite.model.LocationModel;
 import com.opg.sdk.OPGSDK;
 import com.opg.sdk.exceptions.OPGException;
 import com.opg.sdk.geofence.OPGGeofenceTriggerEvents;
 import com.opg.sdk.models.OPGGeofenceStatus;
 import com.opg.sdk.models.OPGGeofenceSurvey;
-import com.opg.sdk.models.OPGSurvey;
+
+import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -56,6 +58,9 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
     private static final String TAG = LocationService.class.getSimpleName();
 
     private String LOCATION_ENABLED_ACTION = "android.location.PROVIDERS_CHANGED";
+    private String GEOFENCE_ENTER_TRANSISTION = "com.opg.my.surveys.lite.transition.enter";
+    private String GEOFENCE_EXIT_TRANSISTION = "com.opg.my.surveys.lite.transition.exit";
+    private String GEOFENCE_DWELL_TRANSISTION = "com.opg.my.surveys.lite.transition.dwell";
     // Google client to interact with Google API
     private GoogleApiClient mGoogleApiClient;
     private Context mContext;
@@ -70,14 +75,12 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
     private static int UPDATE_INTERVAL = 30 * 60 *1000/*300000*/; // 30 minutes
     private static int FATEST_INTERVAL = 5 * 60 * 1000/*300000*/; // 5 minutes
     private static int DISPLACEMENT = 500; // 500 meters
-    private String GEOFENCE_ENTER_TRANSISTION = "com.opg.my.surveys.lite.transition.enter";
-    private String GEOFENCE_EXIT_TRANSISTION = "com.opg.my.surveys.lite.transition.exit";
-    private String GEOFENCE_DWELL_TRANSISTION = "com.opg.my.surveys.lite.transition.dwell";
 
     private List<OPGGeofenceSurvey> opgGeofenceSurveys;
     private StringBuilder stringBuilder ;
     private LocationEnabledReceiver locationEnabledReceiver;
     private OPGSDK opgsdk;
+    private Gson gson;
     private boolean restartGeofencing = false;
 
     public LocationService() {
@@ -106,11 +109,9 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
         filter.addAction(GEOFENCE_EXIT_TRANSISTION);
         filter.addAction(GEOFENCE_DWELL_TRANSISTION);
         this.registerReceiver(locationEnabledReceiver, filter);
-
-
         String lastLocation = MySurveysPreference.getLastLocationKnown(mContext);
-        if(!lastLocation.isEmpty()){
-            mLastLocation = new Gson().fromJson(lastLocation, Location.class);
+        if(lastLocation!=null && !lastLocation.isEmpty()){
+            mLastLocation = getSavedLocation(lastLocation);
         }
         // First we need to check availability of play services
         if (checkPlayServices()) {
@@ -129,8 +130,14 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
     }
 
     private void unregisterLocationChangeReceiver() {
-        if(locationEnabledReceiver != null) {
-            this.unregisterReceiver(locationEnabledReceiver);
+        try {
+            if(locationEnabledReceiver != null) {
+                this.unregisterReceiver(locationEnabledReceiver);
+            }
+        }
+        catch (IllegalArgumentException e)
+        {
+            Log.e("error",e.getMessage());
         }
     }
 
@@ -171,7 +178,7 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
             stopServiceSelf();
             return;
         }
-        if(mLocationRequest!=null) {
+        if(mLocationRequest!=null && mGoogleApiClient.isConnected()) {
             LocationServices.FusedLocationApi.requestLocationUpdates(
                     mGoogleApiClient, mLocationRequest, this);
         }
@@ -185,6 +192,20 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
                 mGoogleApiClient, this);
     }
 
+    private Location getSavedLocation(String lastKnowLocation) {
+        Location location = null;
+        try{
+            JSONObject jsonObject = new JSONObject(lastKnowLocation);
+            LocationModel locationModel = new LocationModel();
+            locationModel =  gson.fromJson(lastKnowLocation, LocationModel.class);
+            location = locationModel.retriveLocation();
+        }catch (Exception e){
+            if(BuildConfig.DEBUG){
+                Log.i(TAG,e.toString());
+            }
+        }
+        return location;
+    }
 
     /**
      * This class used to monitor SMS
@@ -201,20 +222,36 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
             }else if(intent.getAction().equalsIgnoreCase(GEOFENCE_EXIT_TRANSISTION)){
                 List<OPGGeofenceSurvey> exitedSurveys = Util.convertStringToOPGGeofenceList(intent.getStringExtra("triggeredGeofences"));
                 exitedSurveysRecieved(exitedSurveys);
-            }else if(intent.getAction().equalsIgnoreCase(GEOFENCE_DWELL_TRANSISTION)){
+            }/*else if(intent.getAction().equalsIgnoreCase(GEOFENCE_DWELL_TRANSISTION)){
                 List<OPGGeofenceSurvey> dwellSurveys = Util.convertStringToOPGGeofenceList(intent.getStringExtra("triggeredGeofences"));
-                dwellSurveysRecieved(dwellSurveys);
-            }
+                //dwellSurveysRecieved(dwellSurveys);
+            }*/
         }
     }
 
     private void enteredSurveysRecieved(List<OPGGeofenceSurvey> list){
         if(BuildConfig.DEBUG) {
             Log.i("com.opg.sdk.enter","surveys Size:" + list.size());
-            System.out.println("List Size:" + list.size());
         }
         try {
-            MySurveys.updateOPGGeofenceSurveys(list,true);
+            for(OPGGeofenceSurvey triggeredSurvey : list)
+            {
+                if(triggeredSurvey.isEnter() && triggeredSurvey.isExit())
+                {
+                    MySurveysPreference.setGeofenceSurveyEnabled(this,triggeredSurvey.getSurveyReference()+"_"+triggeredSurvey.getAddressID(),true);
+                    MySurveys.updateOPGGeofenceSurveys(triggeredSurvey,true);
+                }
+                else if(triggeredSurvey.isEnter() && !triggeredSurvey.isExit())
+                {
+                    MySurveysPreference.setGeofenceSurveyEnabled(this,triggeredSurvey.getSurveyReference()+"_"+triggeredSurvey.getAddressID(),true);
+                    MySurveys.updateOPGGeofenceSurveys(triggeredSurvey,true);
+                }
+                else if(!triggeredSurvey.isEnter() && triggeredSurvey.isExit() && !isAlreadyEntered(triggeredSurvey) )
+                {
+                    MySurveysPreference.setGeofenceSurveyEnabled(this,triggeredSurvey.getSurveyReference()+"_"+triggeredSurvey.getAddressID(),false);
+                    MySurveys.updateOPGGeofenceSurveys(triggeredSurvey,true);
+                }
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -222,23 +259,41 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
     private void exitedSurveysRecieved(List<OPGGeofenceSurvey> list){
         if(BuildConfig.DEBUG) {
             Log.i("com.opg.sdk.exit","Surveys Size:" + list.size());
-            System.out.println("List Size:" + list.size());
         }
         try {
-            MySurveys.updateOPGGeofenceSurveys(list,false);
+            for(OPGGeofenceSurvey triggeredSurvey : list)
+            {
+                if(triggeredSurvey.isEntered() && triggeredSurvey.isExit())
+                {
+                    MySurveys.updateOPGGeofenceSurveys(triggeredSurvey,true);
+                    MySurveysPreference.setGeofenceSurveyEnabled(this,triggeredSurvey.getSurveyReference()+"_"+triggeredSurvey.getAddressID(),true);
+                }else if(triggeredSurvey.isEnter() && !triggeredSurvey.isExit())
+                {
+                    MySurveys.updateOPGGeofenceSurveys(triggeredSurvey,true);
+                    MySurveysPreference.setGeofenceSurveyEnabled(this,triggeredSurvey.getSurveyReference()+"_"+triggeredSurvey.getAddressID(),false);
+                }
+                else if(!triggeredSurvey.isEnter() && triggeredSurvey.isExit() && isAlreadyEntered(triggeredSurvey))
+                {
+                    MySurveys.updateOPGGeofenceSurveys(triggeredSurvey,true);
+                    MySurveysPreference.setGeofenceSurveyEnabled(this,triggeredSurvey.getSurveyReference()+"_"+triggeredSurvey.getAddressID(),true);
+                }
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
-
     }
-    private void dwellSurveysRecieved(List<OPGGeofenceSurvey> list){
-        if(BuildConfig.DEBUG)
-            System.out.println("List Size:"+list.size());
-        try {
-            MySurveys.updateOPGGeofenceSurveys(list,true);
-        } catch (Exception e) {
-            e.printStackTrace();
+
+    private boolean isAlreadyEntered(OPGGeofenceSurvey triggeredSurvey) throws Exception
+    {
+        List<OPGGeofenceSurvey> opgGeofenceSurveys = RetriveOPGObjects.getOPGGeofenceSurveys();
+        for(OPGGeofenceSurvey survey : opgGeofenceSurveys)
+        {
+            if(survey.getAddressID() == triggeredSurvey.getAddressID() && survey.getSurveyID() == triggeredSurvey.getSurveyID() && survey.isEntered())
+            {
+                return survey.isEntered();
+            }
         }
+        return false;
     }
 
 
@@ -328,9 +383,18 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
     }
 
     public void storeLastLocation(Location lastKnowLocation){
-        if(lastKnowLocation!=null){
-            String json = lastKnowLocation == null ? null : new Gson().toJson(mLastLocation);
-            MySurveysPreference.setLastLocationKnown(mContext,json);
+        try
+        {
+            if(lastKnowLocation!=null){
+                LocationModel locationModel = new LocationModel();
+                locationModel.saveLocation(lastKnowLocation);
+                String json = new Gson().toJson(locationModel);
+                MySurveysPreference.setLastLocationKnown(mContext,json);
+            }
+        }
+        catch (Exception ex)
+        {
+            ex.printStackTrace();
         }
     }
 
@@ -360,11 +424,11 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
         }
     }
 
-    public String getCurrentTime() {
+    /*public String getCurrentTime() {
         Calendar calendar = Calendar.getInstance();
         SimpleDateFormat mdformat = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
         return "Current Time : " + mdformat.format(calendar.getTime());
-    }
+    }*/
 
 
     @Override
@@ -435,11 +499,6 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
         //exitedSurveysRecieved(list);
     }
 
-    @Override
-    public void didDwellSurveyRegion(Location location, List<OPGGeofenceSurvey> list) {
-        //dwellSurveysRecieved(list);
-    }
-
 
     private class GetGeofenceSurveys extends AsyncTask<Void,Void,List<OPGGeofenceSurvey>> {
 
@@ -453,12 +512,32 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
             this.longitude = longitude;
             this.latitude = latitude;
             this.service = activity;
+            //Toast.makeText(mContext,"Geofence Service Started",Toast.LENGTH_SHORT).show();
         }
 
         @Override
         protected List<OPGGeofenceSurvey> doInBackground(Void... voids) {
+            List<OPGGeofenceSurvey> geofenceSurveyList = null;
             try {
-                return opgsdk.getGeofenceSurveys(mContext, (float) latitude, (float) longitude);
+                geofenceSurveyList = opgsdk.getGeofenceSurveys(mContext, (float) latitude, (float) longitude);
+                if(geofenceSurveyList != null && geofenceSurveyList.size() > 0)
+                {
+                    try
+                    {
+                        //deleting the exist surveys from Db
+                        UpdateOPGObjects.clearOPGGeofencesDB();
+                        for (OPGGeofenceSurvey geofenceSurvey : geofenceSurveyList)
+                        {
+                            SaveOPGObjects.storeGeofenceSurvey(geofenceSurvey);
+                        }
+                        //We are retrieving again becoz if non event type is selected in Account toolkit we are making default EntryType(for old account toolkit)
+                        geofenceSurveyList =  RetriveOPGObjects.getOPGGeofenceSurveys();
+                    }catch (Exception ex)
+                    {
+                        ex.printStackTrace();
+                    }
+                }
+                return geofenceSurveyList;
             } catch (OPGException e) {
                 e.printStackTrace();
                 exception = e;
@@ -473,40 +552,8 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
                 if (mContext != null) {
 
                     if (opgGeofenceSurveys != null) {
-                        if(opgGeofenceSurveys.size() >0){
-                            try {
-                                UpdateOPGObjects.clearOPGGeofencesDB();
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            }
-                            if(BuildConfig.DEBUG){
-                                Log.d(TAG,"Geosurveys Size:"+opgGeofenceSurveys.size()+"\n"+getCurrentTime());
-                            }
-                            List<OPGSurvey> surveys = null;
-                            try {
-                                 surveys = RetriveOPGObjects.getAllSurveys();
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            }
-                            try {
-                            //filtering only Online geofence surveys
-                               for(OPGSurvey opgSurvey : surveys)
-                                {
-                                    for (OPGGeofenceSurvey opgGeofenceSurvey : opgGeofenceSurveys)
-                                    {
-                                            if(opgSurvey.getSurveyID() == opgGeofenceSurvey.getSurveyID())
-                                            {
-                                                SaveOPGObjects.storeGeofenceSurvey(opgGeofenceSurvey);
-                                            }
-                                    }
-                                }
-
-                                opgGeofenceSurveys = RetriveOPGObjects.getOPGGeofenceSurveys();
-                            }
-                            catch (Exception ex)
-                            {
-                                ex.printStackTrace();
-                            }
+                        if(opgGeofenceSurveys.size() >0)
+                        {
                             if (MySurveysPreference.getIsGeofencingEnabled(mContext) && opgGeofenceSurveys.size() > 0) {
                                 opgsdk.startGeofencingMonitor(mContext, mGoogleApiClient, opgGeofenceSurveys, (OPGGeofenceTriggerEvents) service);
                             } else {

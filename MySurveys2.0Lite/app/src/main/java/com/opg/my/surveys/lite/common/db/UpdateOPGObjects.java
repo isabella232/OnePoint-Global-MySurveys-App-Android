@@ -41,12 +41,12 @@ public class UpdateOPGObjects {
         }
     }
 
-    public static boolean updateOPGGeofenceSurveyStatus(long addressID,long surveyID,boolean status) throws Exception {
+    public static boolean updateOPGGeofenceSurveyStatus(long addressID,long surveyID,boolean isEntered) throws Exception {
         GeofenceSurveyFactory factory = new GeofenceSurveyFactory();
         CSList<IGeofenceSurvey> list = factory.findByAddressIDSurveyID((int)addressID,surveyID);
         if (list.size() > 0) {
             GeofenceSurvey survey = (GeofenceSurvey) list.get(0);
-            survey.setIsEntered(status);
+            survey.setIsEntered(isEntered);
             return factory.save(survey);
         } else{
             return false;

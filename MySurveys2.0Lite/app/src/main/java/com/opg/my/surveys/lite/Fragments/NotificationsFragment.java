@@ -12,6 +12,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.GestureDetectorCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -80,14 +81,14 @@ public class NotificationsFragment extends Fragment implements View.OnClickListe
         iff.addAction(Util.BROADCAST_ACTION_NOTIFICATION);
         iff.addAction(Util.BROADCAST_ACTION_REFRESH);
         iff.addAction(Util.BROADCAST_ACTION_SAVE_DATA);
-        getActivity().registerReceiver(mReceiver, iff);
+        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(mReceiver, iff);
     }
 
 
     @Override
     public void onPause() {
         super.onPause();
-        getActivity().unregisterReceiver(mReceiver);
+        LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(mReceiver);
     }
 
     @Override

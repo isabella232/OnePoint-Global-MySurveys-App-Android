@@ -18,6 +18,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.preference.SwitchPreferenceCompat;
 import android.support.v7.widget.SwitchCompat;
 import android.util.Log;
@@ -236,7 +237,7 @@ public class SettingsFragment extends Fragment implements View.OnClickListener{
         updateGeofenceSwitch();
         IntentFilter iff= new IntentFilter();
         iff.addAction(Util.BROADCAST_ACTION_GEOFENCE_UI);
-        getActivity().registerReceiver(mReceiver, iff);
+        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(mReceiver, iff);
     }
 
     private void updateGeofenceSwitch() {
@@ -249,7 +250,7 @@ public class SettingsFragment extends Fragment implements View.OnClickListener{
 
     @Override
     public void onPause() {
-        getActivity().unregisterReceiver(mReceiver);
+        LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(mReceiver);
         super.onPause();
     }
 

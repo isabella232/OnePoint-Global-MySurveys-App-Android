@@ -28,6 +28,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -124,7 +125,6 @@ public class HomeActivity extends AppCompatActivity implements OPGGeofenceTrigge
     private SettingsRootFragment settingsRootFragment;
     private ProfileFragment profileFragment;
 
-    public AsyncTask<Void,Void,List<OPGGeofenceSurvey>> getGeofenceSurveys;
 
     private int[] tab_icons = {R.drawable.icon_survey,R.drawable.icon_notification,R.drawable.icon_settings,R.drawable.icon_profile};
 
@@ -198,7 +198,7 @@ public class HomeActivity extends AppCompatActivity implements OPGGeofenceTrigge
             {
                 if(intent.hasExtra("message")){
                     refreshAnimationStop();
-                    Util.showMessageDialog(mContext,intent.getStringExtra("message"));
+                    Util.showMessageDialog(mContext,intent.getStringExtra("message"),"");
                 }else{
                     refreshData();
                 }
@@ -445,6 +445,7 @@ public class HomeActivity extends AppCompatActivity implements OPGGeofenceTrigge
      * Called when we are refreshing the db
      */
     private void onRefresh() {
+        MySurveysPreference.clearEnabledSurveys(this);
         if (!Util.isServiceRunning(mContext , FetchDataService.class)) {
             refreshAnimationStart();
                 refreshData();
@@ -545,6 +546,7 @@ public class HomeActivity extends AppCompatActivity implements OPGGeofenceTrigge
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults)
     {
         boolean locationPerGranted = false;
+        boolean isLocationDialogDisplayed = false;
         for (int i = 0, len = permissions.length; i < len; i++)
         {
             final String permission = permissions[i];
@@ -568,8 +570,9 @@ public class HomeActivity extends AppCompatActivity implements OPGGeofenceTrigge
                                 break;
                         }
                     }
-                    else if(requestCode == REQUEST_CODE_LOCATION)
+                    else if(requestCode == REQUEST_CODE_LOCATION && !isLocationDialogDisplayed)
                     {
+                        isLocationDialogDisplayed = true;
                         Util.showPermissionDialog(this,getString(R.string.location_permission));
                     }
                     else
@@ -629,13 +632,13 @@ public class HomeActivity extends AppCompatActivity implements OPGGeofenceTrigge
         iff.addAction(Util.ACTION_UPLOAD_RESULT);
         iff.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
         iff.addAction(Util.ACTION_SESSION_EXPIRED);
-        registerReceiver(mReceiver, iff);
+        LocalBroadcastManager.getInstance(this).registerReceiver(mReceiver, iff);
         performAPIOperations();
     }
 
     @Override
     protected void onPause() {
-        unregisterReceiver(mReceiver);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(mReceiver);
         super.onPause();
     }
 
@@ -694,7 +697,7 @@ public class HomeActivity extends AppCompatActivity implements OPGGeofenceTrigge
         if(BuildConfig.DEBUG)
             System.out.println("Location:"+location.getLatitude()+"\n List Size:"+list.size());
         try {
-            MySurveys.updateOPGGeofenceSurveys(list,true);
+            //MySurveys.updateOPGGeofenceSurveys(list,true);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -706,23 +709,13 @@ public class HomeActivity extends AppCompatActivity implements OPGGeofenceTrigge
         if(BuildConfig.DEBUG)
             System.out.println("Location:"+location.getLatitude()+"\n List Size:"+list.size());
         try {
-            MySurveys.updateOPGGeofenceSurveys(list,false);
+           // MySurveys.updateOPGGeofenceSurveys(list,false);
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    //Triggered when the device present in any particular geofence areas
-    @Override
-    public void didDwellSurveyRegion(Location location, List<OPGGeofenceSurvey> list) {
-        if(BuildConfig.DEBUG)
-            System.out.println("Location:"+location.getLatitude()+"\n List Size:"+list.size());
-        try {
-            MySurveys.updateOPGGeofenceSurveys(list,true);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
+
 
     @Override
     public void onConnected(@Nullable Bundle bundle) {
@@ -851,9 +844,11 @@ public class HomeActivity extends AppCompatActivity implements OPGGeofenceTrigge
     }
     public class LogoutAsyncTask extends AsyncTask<GoogleApiClient,Void,Void>
     {
+        OPGSDK opgsdk ;
         LogoutListener logoutListener;
         public LogoutAsyncTask( LogoutListener logoutListener)
         {
+            this.opgsdk = new OPGSDK();
             this.logoutListener = logoutListener;
         }
         @Override
@@ -874,76 +869,21 @@ public class HomeActivity extends AppCompatActivity implements OPGGeofenceTrigge
                 long panelId = MySurveysPreference.getCurrentPanelID(mContext);
                 String currentPanelName = MySurveysPreference.getCurrentPanelName(mContext);
                 String logoText = MySurveysPreference.getLogoText(mContext);
-                Util.getOPGSDKInstance().logout(mContext); //SDK LOgout
+                int loginType  = MySurveysPreference.getLoginType(mContext);
+                this.opgsdk.logout(mContext); //SDK Logout
 
-                //Trying to stop the background service which fetch the data from the server
-                if(Util.isServiceRunning(mContext,FetchDataService.class)){
-                    mContext.stopService(new Intent(mContext,FetchDataService.class));
-                }
-
-                //Trying to stop the upload offline results if they are uploading.
-                if(Util.isServiceRunning(mContext,LocationService.class)){
-                    mContext.stopService(new Intent(mContext,LocationService.class));
-                }
-
-                //trying to stop already running getGeofenceSurveysAsync Task
+                stopFetchDataService();
+                stopLocationServiceIfRunning();
+                stopProfileImageIfUploading();
+                stopGeofencing();
                 try {
-                    if (((HomeActivity) mContext).getGeofenceSurveys != null && ((HomeActivity) mContext).getGeofenceSurveys.getStatus() != AsyncTask.Status.FINISHED) {
-                        ((HomeActivity) mContext).getGeofenceSurveys.cancel(true);
-                    }
-                }catch (Exception ex){
-                    Log.i(TAG,ex.getMessage());
-                }
-                //trying to stop already running updProfileImageAsync Task
-                try {
-                    if (((HomeActivity) mContext).updProfileImage != null && ((HomeActivity) mContext).updProfileImage.getStatus() != AsyncTask.Status.FINISHED) {
-                        ((HomeActivity) mContext).updProfileImage.cancel(true);
-                    }
-                }catch (Exception ex){
-                    Log.i(TAG,ex.getMessage());
-                }
-
-                //trying to stop the  geofencing in the sdk.
-                try {
-                    Util.getOPGSDKInstance().stopGeofencingMonitor(mContext.getApplicationContext(),((HomeActivity)mContext).getmGoogleApiClient(), (HomeActivity)mContext);
-                } catch (OPGException e) {
-                    Log.i(TAG,e.getMessage());
-                }
-                try {
-                    //Google SignOut
-                    if(MySurveysPreference.getLoginType(mContext) == LoginType.GOOGLE.ordinal()&& mGoogleApiClient != null && mGoogleApiClient.isConnected())
-                    {
-                        Auth.GoogleSignInApi.signOut(mGoogleApiClient).setResultCallback(
-                                new ResultCallback<com.google.android.gms.common.api.Status>() {
-                                    @Override
-                                    public void onResult(com.google.android.gms.common.api.Status status) {
-                                        if(BuildConfig.DEBUG && status!=null){
-                                            Log.i(TAG,status.getStatusMessage());
-                                            Log.i(TAG,String.valueOf(status.getStatus().getStatusCode()));
-                                        }
-                                    }
-                                });
-                    }
-                    if(MySurveysPreference.getLoginType(mContext) == LoginType.FACEBOOK.ordinal()) {
-                        LoginManager.getInstance().logOut();//Facebook Logout
-                    }
-                    String response = Util.getOPGSDKInstance().unRegisterNotifications(mContext, FirebaseInstanceId.getInstance().getToken());
-                    if(BuildConfig.DEBUG) {
-                        Log.d("Server Response:", response);
-                    }
+                    signOutFromGoogle(loginType);
+                    signOutFromFacebook(loginType);
+                    unregisterFromFCMNotifications();
                 } catch (Exception ex) {
                     Log.i(TAG,ex.getMessage());
                 }finally {
-                    MySurveysPreference.clearPreference(mContext); //Clearing SharedPreference
-                    MySurveysPreference.setThemeActionBtnColor(mContext,actionBtnColor);
-                    MySurveysPreference.setLoginBgMediaId(mContext,loginBgMediaId);
-                    MySurveysPreference.setHeaderMediaId(mContext,headerMediaId);
-                    MySurveysPreference.setCurrentPanelID(mContext,panelId);
-                    MySurveysPreference.setCurrentPanelName(mContext,currentPanelName);
-                    MySurveysPreference.setLogoText(mContext,logoText);
-                    Util.clearDB("");  //Clearing DB
-                    NotificationManager notificationManager = (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
-                    notificationManager.cancelAll(); // clearing the pending notification
+                    clearPreferences(actionBtnColor,loginBgMediaId,headerMediaId,panelId,currentPanelName,logoText);
                 }
             }
             return null;
@@ -953,6 +893,104 @@ public class HomeActivity extends AppCompatActivity implements OPGGeofenceTrigge
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
             logoutListener.onCompleted();
+        }
+
+
+        private void unregisterFromFCMNotifications() {
+            String response = this.opgsdk.unRegisterNotifications(mContext, FirebaseInstanceId.getInstance().getToken());
+            if(BuildConfig.DEBUG) {
+                Log.d("Server Response:", response);
+            }
+        }
+
+        /**
+         * Logout from facebook
+         * @param loginType
+         */
+        private void signOutFromFacebook(int loginType) {
+            if(loginType == LoginType.FACEBOOK.ordinal())
+            {
+                LoginManager.getInstance().logOut();//Facebook Logout
+            }
+        }
+
+        /**
+         * Logout from google+
+         * @param loginType
+         */
+        private void signOutFromGoogle(int loginType) {
+            if(loginType == LoginType.GOOGLE.ordinal()&& mGoogleApiClient != null && mGoogleApiClient.isConnected())
+            {
+                Auth.GoogleSignInApi.signOut(mGoogleApiClient).setResultCallback(
+                        new ResultCallback<com.google.android.gms.common.api.Status>() {
+                            @Override
+                            public void onResult(com.google.android.gms.common.api.Status status) {
+                                if(BuildConfig.DEBUG && status!=null){
+                                    Log.i(TAG,status.getStatusMessage() !=null ? status.getStatusMessage() : "");
+                                    if(status.isSuccess()) //  Use isSuccess() to determine whether the call was successful
+                                    {
+                                        Log.i(TAG,String.valueOf(status.getStatus().getStatusCode()));
+                                    }
+                                }
+                            }
+                        });
+            }
+        }
+
+        /**
+         * Stops the background service which fetch the data from the server.
+         */
+        private void stopFetchDataService() {
+            if(Util.isServiceRunning(mContext,FetchDataService.class)){
+                mContext.stopService(new Intent(mContext,FetchDataService.class));
+            }
+        }
+
+        /**
+         * Stops the location service if it is running in background
+         */
+        private void stopLocationServiceIfRunning() {
+            if(Util.isServiceRunning(mContext,LocationService.class)){
+                mContext.stopService(new Intent(mContext,LocationService.class));
+            }
+        }
+
+        /**
+         *  Stops the already running updProfileImageAsyncTask
+         */
+        private void stopProfileImageIfUploading() {
+            try {
+                if (((HomeActivity) mContext).updProfileImage != null && ((HomeActivity) mContext).updProfileImage.getStatus() != AsyncTask.Status.FINISHED) {
+                    ((HomeActivity) mContext).updProfileImage.cancel(true);
+                }
+            }catch (Exception ex){
+                Log.i(TAG,ex.getMessage());
+            }
+        }
+
+        /**
+         * Stop the  geofencing in the sdk if it is already started.
+         */
+        private void stopGeofencing() {
+            try {
+                this.opgsdk.stopGeofencingMonitor(mContext.getApplicationContext(),((HomeActivity)mContext).getmGoogleApiClient(), (HomeActivity)mContext);
+            } catch (OPGException e) {
+                Log.i(TAG,e.getMessage());
+            }
+        }
+
+
+        private void clearPreferences(String actionBtnColor,String loginBgMediaId,String headerMediaId,long panelId,String currentPanelName,String logoText) {
+            MySurveysPreference.clearPreference(mContext); //Clearing SharedPreference
+            MySurveysPreference.setThemeActionBtnColor(mContext,actionBtnColor);
+            MySurveysPreference.setLoginBgMediaId(mContext,loginBgMediaId);
+            MySurveysPreference.setHeaderMediaId(mContext,headerMediaId);
+            MySurveysPreference.setCurrentPanelID(mContext,panelId);
+            MySurveysPreference.setCurrentPanelName(mContext,currentPanelName);
+            MySurveysPreference.setLogoText(mContext,logoText);
+            Util.clearDB("");  //Clearing DB
+            NotificationManager notificationManager = (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
+            notificationManager.cancelAll(); // clearing the pending notification
         }
     }
     public void downloadMedia(DownloadMediaListener downloadMediaListener,long mediaID)

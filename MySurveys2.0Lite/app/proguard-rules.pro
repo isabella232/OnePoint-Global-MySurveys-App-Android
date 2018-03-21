@@ -25,6 +25,9 @@
 
 -keep class android.support.v7.widget.SearchView { *; }
 
+-dontwarn com.opg.my.surveys.plugins.**
+-keep class com.opg.my.surveys.plugins.** { *; }
+
 #-dontwarn org.apache.cordova.**
 #-keep class org.apache.cordova.**{*;}
 

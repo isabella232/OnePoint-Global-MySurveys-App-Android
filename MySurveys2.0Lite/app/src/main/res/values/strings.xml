@@ -32,7 +32,6 @@
     <string name="unknown_error">Oops! unknown error. Please try again</string>
 
 
-
     <!--SurveyPage***********************-->
     <string name="survey_status_new">New</string> <!--The survey is yet to be taken.-->
     <string name="survey_status_pending">Pending</string><!--The survey is not completed fully-->
@@ -83,6 +82,7 @@
     <string name="terms_condition">Terms &amp; Conditions</string>
     <string name="about_us">About Us</string>
     <string name="version">Version</string>
+
     <!--ChangePanel-->
     <string name="current_panel">Current Panel</string>
     <!--ChangePassword-->
@@ -137,6 +137,10 @@
     <string name="sync_msg">Sync in progress. Please wait!</string>
     <string name="please_wait">Please wait.</string>
 
+    <!--Update Google Play Services-->
+    <string name="update_google_play_service" translatable="false">Update Google Play Services to get location based surveys </string>
+    <string name="update" translatable="false">Update</string>
+
     <!--Runtime Permission Dialog-->
     <string name="runtime_permission" translatable="false">Your permission required.</string>
     <string name="storage_permission" translatable="false">This lets My Surveys to download and store the offline surveys.</string>
@@ -144,11 +148,25 @@
     <string name="gallery_permission" translatable="false">This lets My Surveys to store and access information like photos on your phone and it\'s SD Card.</string>
     <string name="location_permission" translatable="false">We need to access your location in order to display location based survey.</string>
     <string name="allow" translatable="false">allow</string>
+
+    <!--Runtime Permissions -->
+    <string name="storage_permission_msg" translatable="false">Requires storage permissions to take the survey.As the survey needs to access the files, photos etc.</string>
+    <string name="access_permission_msg" translatable="false">Requires storage permissions to access the files, photos ,videos etc.</string>
+    <string name="location_permission_msg" translatable="false">Requires location permission to access the location.</string>
+    <string name="camera_permission_msg" translatable="false">Requires camera permission to capture an image.</string>
+    <string name="audio_permission_msg" translatable="false">Requires record audio permission to record the audio.</string>
+    <string name="record_permission_msg" translatable="false">Requires camera and audio permissions to record the video.</string>
+    <string name="app_settings" translatable="false">App Settings</string>
+    <string name="activate_storage_msg" translatable="false">Activate storage under the permissions menu.</string>
+    <string name="deny" translatable="false">Deny</string>
+
     <!--Geofencing Strings -->
     <string name="gps_network_not_enabled">Location services not enabled.Please enable it.</string>
     <string name="open_location_settings">Location Settings</string>
     <string name="welcome_to">Welcome to</string>
-    <string name="geofence_noti_msg">! You have survey available at this location</string>
+    <string name="geofence_noti_msg">You have survey available at this location</string>
+    <string name="survey_available" translatable="false">You have survey available.</string>
+    <string name="thank_you_for_visiting" translatable="false">Thank You for visiting</string>
 
     <string name="take_survey">Take Survey</string>
 
@@ -161,6 +179,26 @@
 
     <string name="reason_str">Reason:</string>
     <string name="session_expired_login_again" translatable="false">Session expired.Please login again</string>
+    <string name="clear" translatable="false">Clear</string>
+    <string name="sign_here_title" translatable="false">Please sign here</string>
+    <string name="title_activity_signature" translatable="false">Signature</string>
+    <string name="title_activity_currency" translatable="false">Currency</string>
+    <string name="default_currency_value" translatable="false">0.00</string>
+    <string name="ok_str" translatable="false">OK</string>
 
+
+    <string name="ok" translatable="false">OK</string>
+    <string name="permission_camera_rationale" translatable="false">Access to the camera is needed for detection</string>
+    <string name="no_camera_permission" translatable="false">This application cannot run because it does not have the camera permission.  The application will now exit.</string>
+    <string name="low_storage_error" translatable="false">Ocr dependencies cannot be downloaded due to low device storage</string>
+    <string name="title_activity_main" translatable="false">Ocr Detector Sample</string>
+    <string name="ocr_header" translatable="false">Click &quot;Detect Text&quot; to detect text</string>
+    <string name="read_text" translatable="false">Detect Text</string>
+    <string name="auto_focus" translatable="false">Auto Focus</string>
+    <string name="use_flash" translatable="false">Use Flash</string>
+    <string name="ocr_success" translatable="false">Text read successfully</string>
+    <string name="ocr_failure" translatable="false">No text captured</string>
+    <string name="ocr_error" translatable="false"> "Error reading text: %1$s"</string>
+    <string name="ocr_capture_msg" translatable="false">Tap to capture. Pinch/Stretch to zoom</string>
 
 </resources>

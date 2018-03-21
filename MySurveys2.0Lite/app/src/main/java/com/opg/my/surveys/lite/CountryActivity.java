@@ -24,11 +24,14 @@ import com.opg.my.surveys.lite.common.MySurveysPreference;
 import com.opg.my.surveys.lite.common.Util;
 import com.opg.my.surveys.lite.common.db.RetriveOPGObjects;
 import com.opg.sdk.models.OPGCountry;
+import com.opg.sdk.models.OPGPanellistProfile;
+
 import java.util.ArrayList;
 
 public class CountryActivity extends RootActivity {
 
     private RecyclerView recyclerView;
+    private OPGPanellistProfile panellistProfile;
     private CountryAdapter countryAdapter;
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -44,6 +47,11 @@ public class CountryActivity extends RootActivity {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
         actionBar.setBackgroundDrawable(new ColorDrawable(Color.parseColor(MySurveysPreference.getThemeActionBtnColor(this))));
+
+        if(getIntent() != null )
+        {
+            panellistProfile = getIntent().getParcelableExtra("panellistProfile");
+        }
 
         try
         {
@@ -135,8 +143,12 @@ public class CountryActivity extends RootActivity {
                 public void onClick(View view)
                 {
                     Intent intent = new Intent();
-                    intent.putExtra("CountryName",opgCountry.getCountryName());
-                    intent.putExtra("CountrySTD",opgCountry.getStd());
+                    if(panellistProfile != null)
+                    {
+                        panellistProfile.setCountryName(opgCountry.getCountryName());
+                        panellistProfile.setStd(opgCountry.getStd());
+                        intent.putExtra("panellistProfile",panellistProfile);
+                    }
                     setResult(RESULT_OK,intent);
                     finish();
                 }
@@ -165,7 +177,7 @@ public class CountryActivity extends RootActivity {
                         {
                             if(opgCountry.getCountryName().toLowerCase().contains(countryName.toLowerCase()))
                             {
-                               filteredList.add(opgCountry);
+                                filteredList.add(opgCountry);
                             }
                         }
                         filteredCountries = filteredList;
@@ -188,6 +200,7 @@ public class CountryActivity extends RootActivity {
     @Override
     protected void onDestroy() {
         recyclerView = null;
+        panellistProfile = null;
         super.onDestroy();
     }
 }

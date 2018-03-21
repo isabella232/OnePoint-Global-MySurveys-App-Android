@@ -25,6 +25,7 @@ import android.widget.Toast;
 
 import com.opg.my.surveys.lite.common.MySurveysPreference;
 import com.opg.my.surveys.lite.common.Util;
+import com.opg.sdk.exceptions.OPGException;
 import com.opg.sdk.models.OPGForgotPassword;
 
 import java.util.regex.Matcher;
@@ -62,7 +63,11 @@ public class ForgotPasswordActivity extends RootActivity implements View.OnClick
             }
         });
 
-        pDialog = Util.getProgressDialog(mContext);
+        try {
+            pDialog = Util.getProgressDialog(mContext);
+        } catch (OPGException e) {
+            e.printStackTrace();
+        }
 
         main_title.setTypeface(Typeface.createFromAsset(this.getAssets(), "font/roboto_regular.ttf"));
         sub_title.setTypeface(Typeface.createFromAsset(this.getAssets(), "font/roboto_regular.ttf"));
@@ -130,7 +135,7 @@ public class ForgotPasswordActivity extends RootActivity implements View.OnClick
             new ForgotPassword(email_id,userNameEt).execute();
         }
         else if(!Util.isOnline(mContext)) {
-            Util.showMessageDialog(mContext, getString(R.string.no_network_msg));
+            Util.showMessageDialog(mContext, getString(R.string.no_network_msg),"");
         }
         else {
             verifyEmail(email_id);
@@ -157,7 +162,8 @@ public class ForgotPasswordActivity extends RootActivity implements View.OnClick
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            pDialog.show();
+            if(pDialog != null)
+                pDialog.show();
         }
 
         @Override
@@ -174,7 +180,7 @@ public class ForgotPasswordActivity extends RootActivity implements View.OnClick
         @Override
         protected void onPostExecute(OPGForgotPassword opgForgotPassword) {
             super.onPostExecute(opgForgotPassword);
-            if(pDialog.isShowing()) {
+            if(pDialog != null && pDialog.isShowing()) {
                 pDialog.dismiss();
             }
             if(opgForgotPassword.isSuccess() && !opgForgotPassword.getStatusMessage().equals(Util.EMAIL_ID_NOT_EXIST))
