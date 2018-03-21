@@ -14,6 +14,7 @@ import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.KeyEvent;
@@ -124,7 +125,7 @@ public class PanelFragment extends Fragment {
         IntentFilter iff= new IntentFilter();
         iff.addAction(Util.BROADCAST_ACTION_SAVE_DATA);
         iff.addAction(Util.BROADCAST_ACTION_REFRESH);
-        getActivity().registerReceiver(mReceiver, iff);
+        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(mReceiver, iff);
         getView().setFocusableInTouchMode(true);
         getView().requestFocus();
         if(panelFragment != null) {
@@ -146,7 +147,7 @@ public class PanelFragment extends Fragment {
     @Override
     public void onPause() {
         super.onPause();
-        getActivity().unregisterReceiver(mReceiver);
+        LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(mReceiver);
     }
 
     /**

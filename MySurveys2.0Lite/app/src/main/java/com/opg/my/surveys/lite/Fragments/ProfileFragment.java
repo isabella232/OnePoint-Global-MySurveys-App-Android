@@ -26,6 +26,7 @@ import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.FileProvider;
+import android.support.v4.content.LocalBroadcastManager;
 import android.text.InputFilter;
 import android.text.Spanned;
 import android.util.Log;
@@ -55,6 +56,7 @@ import com.opg.my.surveys.lite.common.RoundedImageView;
 import com.opg.my.surveys.lite.common.Util;
 import com.opg.my.surveys.lite.common.db.RetriveOPGObjects;
 import com.opg.my.surveys.lite.common.db.SaveOPGObjects;
+import com.opg.sdk.exceptions.OPGException;
 import com.opg.sdk.models.OPGDownloadMedia;
 import com.opg.sdk.models.OPGPanellistProfile;
 import com.opg.sdk.models.OPGUpdatePanellistProfile;
@@ -82,7 +84,6 @@ import static com.opg.my.surveys.lite.common.Util.TAG;
 
 public class ProfileFragment extends Fragment implements View.OnClickListener {
 
-
     private static ProfileFragment profileFragment;
     private int CAPTURE_IMAGE_REQUEST_CODE = 1;
     private int PICK_IMAGE_REQUEST_CODE = 2;
@@ -103,7 +104,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
     private Dialog progressDialog;
     private Dialog selectImageDialog;
     private String fileName ;
-    private  File saveFile;
+    private  File saveFile;// =  new File(Environment.getExternalStorageDirectory().getAbsolutePath()+File.separator+ Utils.getApplicationName(getActivity())+File.separator+Util.PROFILE_PICS, fileName);
 
     private boolean updatedCountry = false;
 
@@ -117,7 +118,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
     public  String CANNOT_CREATE_DIR      = "Cannot create dir ";
     private String _currentMediaPath = "";
     private static int MAX_IMAGE_SIZE = 2 * 1024 * 1024;//size in bytes
-
+    private boolean fetchData = true;
 
     private BroadcastReceiver mReceiver = new BroadcastReceiver() {
         @Override
@@ -159,7 +160,11 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         final View view = inflater.inflate(R.layout.fragment_profile, container, false);
-        progressDialog = Util.getProgressDialog(getActivity());
+        try {
+            progressDialog = Util.getProgressDialog(getActivity());
+        } catch (OPGException e) {
+            e.printStackTrace();
+        }
         input_layout_name = (TextInputLayout)view.findViewById(R.id.input_layout_name);
         imgProfile = (RoundedImageView) view.findViewById(R.id.img_profile);
         txtName = (EditText) view.findViewById(R.id.et_name);
@@ -261,12 +266,20 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
 
     @Override
     public void onStop() {
-        if(downloadProfilePic!=null && downloadProfilePic.getStatus() == AsyncTask.Status.RUNNING){
-            downloadProfilePic.cancel(true);
-        }
+        stopDownloadProfilePicAsync();
         downloadProfilePic = null;
         super.onStop();
     }
+
+    /**
+     *  Stops the already running downloadProfileImageAsyncTask
+     */
+    private void stopDownloadProfilePicAsync() {
+        if(downloadProfilePic!=null && downloadProfilePic.getStatus() != AsyncTask.Status.FINISHED){
+            downloadProfilePic.cancel(true);
+        }
+    }
+
 
     @Override
     public void onDestroyView() {
@@ -294,7 +307,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         super.onResume();
         IntentFilter iff= new IntentFilter(Util.BROADCAST_ACTION_SAVE_DATA);
         iff.addAction(Util.BROADCAST_ACTION_REFRESH);
-        getActivity().registerReceiver(mReceiver, iff);
+        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(mReceiver, iff);
         if(!updatedCountry) {
             //not getting the profile frm db when we change the country
             getProfileDataFromLocalDB();
@@ -316,7 +329,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onPause() {
         super.onPause();
-        getActivity().unregisterReceiver(mReceiver);
+        LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(mReceiver);
     }
 
 
@@ -326,15 +339,27 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         if(MySurveysPreference.isDownloaded(getActivity())) {
             try
             {
-                panellistProfile = RetriveOPGObjects.getPanellistProfile();
-                if(panellistProfile != null)
-                {
-                    txtName.setText(panellistProfile.getFirstName());
-                    txtEmailID.setText(panellistProfile.getEmailID());
-                    etCountryName.setText( panellistProfile.getCountryName());
-                    txtName.setSelection(panellistProfile.getFirstName().length());
-                    Util.validateEditext(txtName,input_layout_name,getString(R.string.err_username_msg));
-                }
+                Thread profileDataThread = new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        if(fetchData) {
+                            try {
+                                panellistProfile = RetriveOPGObjects.getPanellistProfile();
+                                getActivity().runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        updateProfileViews();
+                                    }
+                                });
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+                });
+                profileDataThread.setPriority(Thread.MIN_PRIORITY);
+                profileDataThread.start();
+
             }
             catch (Exception ex)
             {
@@ -343,12 +368,44 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         }
     }
 
+    private void updateProfileViews() {
+        if (panellistProfile != null && txtName!=null) {
+            txtName.setText(panellistProfile.getFirstName());
+            txtEmailID.setText(panellistProfile.getEmailID());
+            etCountryName.setText(panellistProfile.getCountryName());
+            txtName.setSelection(panellistProfile.getFirstName().length());
+            Util.validateEditext(txtName, input_layout_name, getString(R.string.err_username_msg));
+        }
+    }
+
     private void getProfileImageFromLocalDB()
     {
+        Thread profileDataThread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                if(fetchData) {
+                    try {
+                        panellistProfile = RetriveOPGObjects.getPanellistProfile();
+                        getActivity().runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                updateProfileImage();
+                            }
+                        });
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        });
+        profileDataThread.setPriority(Thread.MIN_PRIORITY);
+        profileDataThread.start();
+    }
+
+    private void updateProfileImage(){
         try {
-            panellistProfile = RetriveOPGObjects.getPanellistProfile();
             if (panellistProfile != null) {
-                if (!panellistProfile.getMediaID().isEmpty()) {
+                if (panellistProfile.getMediaID()!= null && !panellistProfile.getMediaID().isEmpty()) {
                     String profilePicPath = Util.searchFile(getActivity(),panellistProfile.getMediaID(), Util.PROFILE_PICS);
                     if (profilePicPath != null)
                     {
@@ -361,7 +418,9 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
                 }
             }
         } catch (Exception ex) {
-            Log.i(Util.TAG, ex.getMessage());
+            if(BuildConfig.DEBUG) {
+                Log.i(Util.TAG, ex.toString());
+            }
         }
     }
 
@@ -370,38 +429,58 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         if (progressBar != null) {
             progressBar.setVisibility(View.VISIBLE);
         }
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                BitmapFactory.Options options = new BitmapFactory.Options();
-                options.inScaled = false;
-                final Bitmap bitmap =  BitmapFactory.decodeFile(profilePicPath,options);
-                getActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (progressBar != null && !isUploading()) {
-                            progressBar.setVisibility(View.GONE);
+        if(imgProfile != null)
+        {
+            imgProfile.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        if(imgProfile!=null) {
+                            // First decode with inJustDecodeBounds=true to check dimensions
+                            final BitmapFactory.Options options = new BitmapFactory.Options();
+                            options.inJustDecodeBounds = true;
+                            BitmapFactory.decodeFile(profilePicPath, options);
+
+
+                            // Calculate inSampleSize
+                            options.inSampleSize = calculateInSampleSize(options, imgProfile.getMeasuredWidth(), imgProfile.getMeasuredHeight());
+
+                            // Decode bitmap with inSampleSize set
+                            options.inJustDecodeBounds = false;
+                            final Bitmap bitmap = BitmapFactory.decodeFile(profilePicPath, options);
+
+                            getActivity().runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    if (progressBar != null && !isUploading()) {
+                                        progressBar.setVisibility(View.GONE);
+                                    }
+                                    if (bitmap != null) {
+                                        /**
+                                         *  don't combine both statements as there is dependency for
+                                         *  the bitmap and the imgProfile. So we need to check them seperately
+                                         *  @Neeraj
+                                         */
+                                        if (imgProfile != null) {
+                                            imgProfile.setImageBitmap(bitmap);
+                                        }
+                                    } else if (retry) {
+                                        //fix - if corrupted image is present in sdcard then deleting it and downloading it again @Neeraj
+                                        File file = new File(profilePicPath);
+                                        if (file.exists() && file.delete()) {
+                                            downloadMedia(panellistProfile.getMediaID());
+                                        }
+                                    }
+                                }
+                            });
                         }
-                        if (bitmap != null )
-                        {//don't combined doth statements @Neeraj
-                            if(imgProfile !=null)
-                            {
-                                imgProfile.setImageBitmap(bitmap);
-                            }
-                        }
-                        else if(retry)
-                        {
-                            //fix - if corrupted image is present in sdcard then deleting it and downloading it again @Neeraj
-                            File file = new File(profilePicPath);
-                            if(file.exists() && file.delete() )
-                            {
-                                downloadMedia(panellistProfile.getMediaID());
-                            }
-                        }
+                    }catch (Exception ex)
+                    {
+                        ex.printStackTrace();
                     }
-                });
-            }
-        }).start();
+                }
+            },500);
+        }
     }
     @Override
     public void onClick(View view) {
@@ -484,6 +563,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
             imm.hideSoftInputFromWindow(etCountryName.getWindowToken(), 0);
         }
         Intent intent = new Intent(getActivity(), CountryActivity.class);
+        intent.putExtra("panellistProfile",panellistProfile);
         if(intent.resolveActivity(getActivity().getPackageManager()) != null)
         {
             startActivityForResult(intent,Util.COUNTRY_RESULT_CODE);
@@ -552,23 +632,21 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
 
 
     private void logout(final Dialog dialog) {
+        stopDownloadProfilePicAsync();
         ((HomeActivity)getActivity()).logout(mGoogleApiClient, new HomeActivity.LogoutListener() {
             @Override
             public void onStart() {
                 if(dialog!=null && dialog.isShowing()){
                     dialog.dismiss();
                 }
-                if(progressDialog != null)
-                {
+                if(progressDialog != null) {
                     progressDialog.show();
                 }
             }
 
             @Override
             public void onCompleted() {
-
-                if(progressDialog != null)
-                {
+                if(progressDialog != null && progressDialog.isShowing()) {
                     progressDialog.dismiss();
                 }
                 Intent intent = new Intent(getActivity(), LoginActivity.class);
@@ -616,7 +694,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
 
     private void captureImageFromCamera()
     {
-        if(Util.checkPermission(getActivity(), Manifest.permission.CAMERA) && Util.checkPermission(getActivity(), Manifest.permission.READ_EXTERNAL_STORAGE))
+        if(Util.checkPermission(getActivity(), Manifest.permission.CAMERA) && Util.checkPermission(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE))
         {
             isGallery = false;
             Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
@@ -641,7 +719,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
             selectImageDialog.dismiss();
         }
         else {
-            ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.CAMERA,Manifest.permission.READ_EXTERNAL_STORAGE}, REQUEST_CODE_PROFILE);
+            ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.CAMERA,Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_CODE_PROFILE);
         }
     }
 
@@ -710,14 +788,13 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         }
         else if(requestCode == Util.COUNTRY_RESULT_CODE && resultCode == RESULT_OK && data != null )/*&& data.getExtras() != null*/
         {
-            if(data.hasExtra("CountryName") && data.hasExtra("CountrySTD"))
+            if(data.getParcelableExtra("panellistProfile") != null)
             {
                 updatedCountry = true;
-                String countryName  = data.getStringExtra("CountryName");
-                String countrySTD = data.getStringExtra("CountrySTD");
-                panellistProfile.setCountryName(countryName);
-                panellistProfile.setStd(countrySTD);
-                etCountryName.setText(countryName);
+                OPGPanellistProfile newPanellistProfile = data.getParcelableExtra("panellistProfile");
+                panellistProfile.setCountryName(newPanellistProfile.getCountryName());
+                panellistProfile.setStd(newPanellistProfile.getStd());
+                etCountryName.setText(panellistProfile.getCountryName());
             }
         }
     }
@@ -747,7 +824,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
             if(profilePicturePath!=null && !profilePicturePath.isEmpty()){
                 ((HomeActivity)getActivity()).startUploadPic(profilePicturePath);
             }else {
-                Util.showMessageDialog(getActivity(),getResources().getString(R.string.unknown_error));
+                Util.showMessageDialog(getActivity(),getResources().getString(R.string.unknown_error),"");
             }
         }
         else
@@ -812,7 +889,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            if(progressDialog!=null)
+            if(progressDialog != null)
                 progressDialog.show();
         }
 
@@ -839,8 +916,9 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
             super.onPostExecute(opgUpdatePanellistProfile);
             try
             {
-                if (progressDialog!=null)
+                if (progressDialog != null && progressDialog.isShowing()) {
                     progressDialog.dismiss();
+                }
                 if(opgUpdatePanellistProfile.isSuccess())
                 {
                     SaveOPGObjects.storePanellistProfile(panellistProfile);
@@ -890,7 +968,9 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            progressDialog.show();
+            if(progressDialog != null) {
+                progressDialog.show();
+            }
         }
 
         @Override
@@ -933,8 +1013,8 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
 
             int actualHeight = options.outHeight;
             int actualWidth = options.outWidth;
-            float maxHeight = actualHeight;
-            float maxWidth = actualWidth;
+            float maxHeight = 110.0f;
+            float maxWidth = 110.0f;
             float imgRatio = actualWidth / actualHeight;
             float maxRatio = maxWidth / maxHeight;
 
@@ -999,10 +1079,13 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
                 } else if (orientation == 8) {
                     matrix.postRotate(270);
                 }
-                scaledBitmap = Bitmap.createBitmap(scaledBitmap, 0, 0, scaledBitmap.getWidth(), scaledBitmap.getHeight(),
-                        matrix, true);
+                scaledBitmap = Bitmap.createBitmap(scaledBitmap, 0, 0, scaledBitmap.getWidth(), scaledBitmap.getHeight(), matrix, true);
             } catch (IOException e) {
                 e.printStackTrace();
+            }
+            catch (OutOfMemoryError outOfMemoryError)
+            {
+                outOfMemoryError.printStackTrace();
             }
             FileOutputStream out = null;
             String filename = null;
@@ -1029,12 +1112,12 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
                 filename = _currentMediaPath;
             }
             try {
-                int compressionRate = 90;
+                int compressionRate = 95;
                 if(FileUtils.getFileSize(_currentMediaPath) > MAX_IMAGE_SIZE){
                     do{
                         out = new FileOutputStream(filename);
                         scaledBitmap.compress(Bitmap.CompressFormat.JPEG, compressionRate, out);
-                        compressionRate = (int) (compressionRate *(.8));
+                        compressionRate = (int) (compressionRate *(.95));
                     }while (FileUtils.getFileSize(filename) > MAX_IMAGE_SIZE);
                 }
                 return _currentMediaPath;
@@ -1055,17 +1138,17 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         int inSampleSize = 1;
 
         if (height > reqHeight || width > reqWidth) {
-            final int heightRatio = Math.round((float) height / (float) reqHeight);
-            final int widthRatio = Math.round((float) width / (float) reqWidth);
-            inSampleSize = heightRatio < widthRatio ? heightRatio : widthRatio;
-        }
-        final float totalPixels = width * height;
-        final float totalReqPixelsCap = reqWidth * reqHeight * 2;
 
-        while (totalPixels / (inSampleSize * inSampleSize) > totalReqPixelsCap) {
-            inSampleSize++;
-        }
+            final int halfHeight = height / 2;
+            final int halfWidth = width / 2;
 
+            // Calculate the largest inSampleSize value that is a power of 2 and keeps both
+            // height and width larger than the requested height and width.
+            while ((halfHeight / inSampleSize) >= reqHeight && (halfWidth / inSampleSize) >= reqWidth)
+            {
+                inSampleSize *= 2;
+            }
+        }
         return inSampleSize;
     }
 

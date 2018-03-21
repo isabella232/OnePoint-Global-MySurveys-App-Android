@@ -23,6 +23,7 @@ import android.provider.Settings;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
@@ -34,6 +35,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.facebook.AccessToken;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.gson.Gson;
@@ -44,6 +47,7 @@ import com.opg.my.surveys.lite.Login;
 import com.opg.my.surveys.lite.LoginActivity;
 import com.opg.my.surveys.lite.LoginListener;
 import com.opg.sdk.OPGSDK;
+import com.opg.sdk.exceptions.OPGException;
 import com.opg.sdk.models.OPGGeofenceSurvey;
 import com.opg.sdk.models.OPGPanellistPanel;
 import com.opg.sdk.models.OPGScript;
@@ -51,10 +55,13 @@ import com.opg.my.surveys.lite.R;
 
 import org.apache.commons.io.FilenameUtils;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.reflect.Type;
@@ -63,6 +70,8 @@ import java.util.HashMap;
 import java.util.List;
 
 import OnePoint.Common.Utils;
+
+import static OnePoint.Common.Utils.getApplicationName;
 
 /**
  * Created by kiran on 24-10-2016.
@@ -95,6 +104,7 @@ public class Util
     public static final String MESSAGE_KEY = "message";
 
     public static String OPGSURVEY_KEY = "OPGSurvey";
+    public static final String SCANNED_TEXT = "scanned_text";
 
     public static String UNIQUE_ID_ERROR = "UniqueID does not exist.";
     public static String INVALID_CREDENTIAL = "username and/or password are invalid";
@@ -146,6 +156,7 @@ public class Util
     public static String UPLOADED_STATUS_KEY = "Uploaded";
     public static String UPLOADEDING_STATUS_KEY = "Uploading";
     /*******************************************************/
+    public static String UPDATE = "Update";
 
     /**
      * Keys used in the app.
@@ -218,18 +229,30 @@ public class Util
         dialog.show();
     }
 
-    public static void showMessageDialog(final Context context,String message)
+    public static void showMessageDialog(final Context context,String message,final String code)
     {
         final Dialog dialog = new Dialog(context);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.setContentView(R.layout.dialog_sync);
         ((TextView)dialog.findViewById(R.id.tv_sync_msg)).setText(message);
         Button btnOk = (Button) dialog.findViewById(R.id.btn_okay);
+        if(code.equalsIgnoreCase(UPDATE))
+        {
+            btnOk.setText(R.string.update);
+        }
         btnOk.setTextColor(Color.parseColor(MySurveysPreference.getThemeActionBtnColor(context)));
         btnOk.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                dialog.dismiss();
+                if(code.equalsIgnoreCase(UPDATE))
+                {
+                    ((Activity)context).startActivity(new Intent(Intent.ACTION_VIEW,Uri.parse("https://play.google.com/store/apps/details?id="+ "com.google.android.gms")));
+                    //context.startActivity(new Intent(Intent.ACTION_VIEW,Uri.parse("https://play.google.com/store/apps/details?id="+ "com.google.android.gms")), 1);
+                }
+                else
+                {
+                    dialog.dismiss();
+                }
             }
         });
         dialog.show();
@@ -248,7 +271,9 @@ public class Util
         if(!aBoolean && !message.isEmpty()){
             broadcastIntent.putExtra("message",message);
         }
-        mContext.sendBroadcast(broadcastIntent);
+        //mContext.sendBroadcast(broadcastIntent);
+        LocalBroadcastManager.getInstance(mContext).sendBroadcast(broadcastIntent);
+
     }
 
     public static boolean isValidEmail(CharSequence target) {
@@ -328,6 +353,18 @@ public class Util
             Log.e(mContext.getPackageName(),"Exception network_enabled");
         }
         return gps_enabled || net_enabled;
+    }
+
+    /**
+     * Method to verify google play services on the device
+     * */
+    public static boolean isPlayServicesAvailable(Context mContext) {
+        GoogleApiAvailability googleApiAvailability = GoogleApiAvailability.getInstance();
+        int status = googleApiAvailability.isGooglePlayServicesAvailable(mContext);
+        if (status != ConnectionResult.SUCCESS) {
+            return false;
+        }
+        return (status == ConnectionResult.SUCCESS ? true :false );
     }
 
     public static void showLocationServicesError(final Context mContext){
@@ -460,64 +497,78 @@ public class Util
         return true;
     }
 
-    public static Dialog getProgressDialog(Context mContext){
-        final Dialog progressDialog = new Dialog(mContext);
-        progressDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-        progressDialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
-        progressDialog.setContentView(R.layout.progress_dialog);
-        ProgressBar progressBar4 = (ProgressBar) progressDialog.findViewById(R.id.progressBar4);
-        progressBar4.setIndeterminate(true);
-        progressBar4.getIndeterminateDrawable().setColorFilter(Color.parseColor(MySurveysPreference.getThemeActionBtnColor(mContext)), android.graphics.PorterDuff.Mode.MULTIPLY);
-        progressDialog.setCancelable(false);
-        progressDialog.setCanceledOnTouchOutside(false);
-        return progressDialog;
+    public static Dialog getProgressDialog(Context mContext) throws OPGException {
+        if(mContext != null) {
+            final Dialog progressDialog = new Dialog(mContext);
+            progressDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+            progressDialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
+            progressDialog.setContentView(R.layout.progress_dialog);
+            ProgressBar progressBar4 = progressDialog.findViewById(R.id.progressBar4);
+            progressBar4.setIndeterminate(true);
+            progressBar4.getIndeterminateDrawable().setColorFilter(Color.parseColor(MySurveysPreference.getThemeActionBtnColor(mContext)), android.graphics.PorterDuff.Mode.MULTIPLY);
+            progressDialog.setCancelable(false);
+            progressDialog.setCanceledOnTouchOutside(false);
+            return progressDialog;
+        }else {
+            throw new OPGException("Context is null");
+        }
     }
 
     public static String  moveFile(Context context, String inputPath,String mediaID,String parentFolder)
     {
-        String outputPath = Environment.getExternalStorageDirectory().getAbsolutePath()+File.separator+Utils.getApplicationName(context)+File.separator+parentFolder;
-        String outputFilePath = outputPath + File.separator + mediaID + ".PNG";//+"/"+panellistProfile.getMediaID()+"/.jpg";
+        String outputFilePath = "";
+        try
+        {
+            String outputPath = Environment.getExternalStorageDirectory().getAbsolutePath()+File.separator+Utils.getApplicationName(context)+File.separator+parentFolder;
+            outputFilePath = outputPath + File.separator + mediaID + ".PNG";//+"/"+panellistProfile.getMediaID()+"/.jpg";
 
-        InputStream in;
-        OutputStream out;
-        try {
+            InputStream in;
+            OutputStream out;
+            try {
 
-            //create output directory if it doesn't exist
-            File dir = new File (outputPath);
-            if (!dir.exists())
+                //create output directory if it doesn't exist
+                File dir = new File (outputPath);
+                if (!dir.exists())
+                {
+                    dir.mkdirs();
+                }
+                in = new FileInputStream(inputPath);
+                File file = new File(outputFilePath);
+                out = new FileOutputStream(file);
+
+                byte[] buffer = new byte[1024];
+                int read;
+                while ((read = in.read(buffer)) != -1) {
+                    out.write(buffer, 0, read);
+                }
+                in.close();
+
+                // write the output file
+                out.flush();
+                out.close();
+
+            }
+
+            catch (FileNotFoundException fnfe1)
             {
-                dir.mkdirs();
+                if(BuildConfig.DEBUG)
+                    Log.e("tag", fnfe1.getMessage());
+                outputFilePath = null;
             }
-            in = new FileInputStream(inputPath);
-            File file = new File(outputFilePath);
-            out = new FileOutputStream(file);
-
-            byte[] buffer = new byte[1024];
-            int read;
-            while ((read = in.read(buffer)) != -1) {
-                out.write(buffer, 0, read);
+            catch (Exception e)
+            {
+                Log.e("tag", e.getMessage());
+                outputFilePath = null;
             }
-            in.close();
-
-            // write the output file
-            out.flush();
-            out.close();
-
         }
-
-        catch (FileNotFoundException fnfe1)
+        catch (Exception ex)
         {
-            if(BuildConfig.DEBUG)
-                Log.e("tag", fnfe1.getMessage());
-            outputFilePath = null;
+            ex.printStackTrace();
         }
-        catch (Exception e)
-        {
-            Log.e("tag", e.getMessage());
-            outputFilePath = null;
-        }
+
         return outputFilePath;
     }
+
     public static String searchFile(Context context, String mediaID, String parentFolder)
     {
         String filePath = Environment.getExternalStorageDirectory().getAbsolutePath()+File.separator+ Utils.getApplicationName(context)+File.separator+parentFolder;
@@ -623,5 +674,43 @@ public class Util
 
     public static boolean isTablet(Context context){
         return !context.getResources().getBoolean(R.bool.portrait_only);
+    }
+
+    public static void appendLog(Context context,String text)
+    {
+
+        File myOPGDataFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + getApplicationName(context) + File.separator + "GeofenceLog");
+
+        if (!myOPGDataFile.exists())
+        {
+            myOPGDataFile.mkdir();
+        }
+        File logFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + getApplicationName(context)+ File.separator + "GeofenceLog" + File.separator +"log.txt");
+        //  File logFile = new File("sdcard/log.file");
+        if (!logFile.exists())
+        {
+            try
+            {
+                logFile.createNewFile();
+            }
+            catch (IOException e)
+            {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
+        try
+        {
+            //BufferedWriter for performance, true to set append to file flag
+            BufferedWriter buf = new BufferedWriter(new FileWriter(logFile, true));
+            buf.append(text);
+            buf.newLine();
+            buf.close();
+        }
+        catch (IOException e)
+        {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
     }
 }

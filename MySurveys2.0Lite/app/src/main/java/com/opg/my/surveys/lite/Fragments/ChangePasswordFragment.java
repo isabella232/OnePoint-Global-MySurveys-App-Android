@@ -7,6 +7,7 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.Fragment;
@@ -26,6 +27,7 @@ import com.opg.my.surveys.lite.HomeActivity;
 import com.opg.my.surveys.lite.common.MySurveysPreference;
 import com.opg.my.surveys.lite.common.Util;
 import com.opg.my.surveys.lite.common.db.RetriveOPGObjects;
+import com.opg.sdk.exceptions.OPGException;
 import com.opg.sdk.models.OPGChangePassword;
 import com.opg.my.surveys.lite.R;
 
@@ -94,9 +96,13 @@ public class ChangePasswordFragment extends Fragment implements View.OnClickList
     }
 
     @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-
         View view =  inflater.inflate(R.layout.fragment_change_password, container, false);
         etOldPassword = (EditText)view.findViewById(R.id.et_old_password);
         etNewPassword = (EditText)view.findViewById(R.id.et_new_password);
@@ -132,6 +138,11 @@ public class ChangePasswordFragment extends Fragment implements View.OnClickList
 
 
     @Override
+    public void onStart() {
+        super.onStart();
+    }
+
+    @Override
     public void onResume() {
         super.onResume();
         setEmptyText(); // Reason why we keep it in onResume() https://stackoverflow.com/questions/13303469/edittext-settext-not-working-with-fragment
@@ -153,6 +164,16 @@ public class ChangePasswordFragment extends Fragment implements View.OnClickList
     }
 
     @Override
+    public void onPause() {
+        super.onPause();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+    }
+
+    @Override
     public void onDestroyView() {
         etOldPassword = null;
         etNewPassword = null;
@@ -166,6 +187,13 @@ public class ChangePasswordFragment extends Fragment implements View.OnClickList
         tvChangePwdTitle = null;
         super.onDestroyView();
     }
+
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+    }
+
     private void setEmptyText()
     {
         etOldPassword.setText("");
@@ -235,15 +263,18 @@ public class ChangePasswordFragment extends Fragment implements View.OnClickList
 
     private void changePassword(final String oldPassword,final String newPassword)
     {
-        final Dialog pDialog =Util.getProgressDialog(getActivity());  new ProgressDialog(getActivity());
-        //pDialog.setIndeterminate(true);
-        //pDialog.setCancelable(true);
         new AsyncTask<String,Void,OPGChangePassword>()
         {
+            private Dialog pDialog;
             @Override
             protected void onPreExecute() {
                 super.onPreExecute();
-                pDialog.show();
+                try {
+                    pDialog = Util.getProgressDialog(getActivity());
+                    pDialog.show();
+                } catch (OPGException e) {
+                    e.printStackTrace();
+                }
             }
 
             @Override
@@ -296,7 +327,6 @@ public class ChangePasswordFragment extends Fragment implements View.OnClickList
             }
         }.execute(oldPassword, newPassword);
     }
-    // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri) {
         if(mListener != null)
         {

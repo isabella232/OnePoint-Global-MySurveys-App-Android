@@ -55,6 +55,7 @@ import com.opg.my.surveys.lite.common.LoginType;
 import com.opg.my.surveys.lite.common.MySurveysPreference;
 import com.opg.my.surveys.lite.common.Util;
 import com.opg.sdk.OPGSDK;
+import com.opg.sdk.exceptions.OPGException;
 import com.opg.sdk.models.OPGAuthenticate;
 import com.opg.sdk.models.OPGDownloadMedia;
 
@@ -84,6 +85,7 @@ public class LoginActivity extends RootActivity implements View.OnClickListener,
     private Dialog pDialog;
     private CoordinatorLayout coordinatorLayout;
     private List<String> listPermissionsNeeded;
+    private AsyncTask<Void, Void, OPGDownloadMedia> asyncTask = null;
     private String[] permissions = new String[]{
             Manifest.permission.WRITE_EXTERNAL_STORAGE,
             Manifest.permission.READ_EXTERNAL_STORAGE,
@@ -121,7 +123,11 @@ public class LoginActivity extends RootActivity implements View.OnClickListener,
         setTypeface();
         setDrawable(ContextCompat.getDrawable(mContext,R.drawable.splash_nologo),coordinatorLayout);
 
-        pDialog = Util.getProgressDialog(mContext);
+        try {
+            pDialog = Util.getProgressDialog(mContext);
+        } catch (OPGException e) {
+            e.printStackTrace();
+        }
 
         //hiding the actionbar
         if(getActionBar() != null) {
@@ -200,7 +206,7 @@ public class LoginActivity extends RootActivity implements View.OnClickListener,
             }
             else
             {
-                AsyncTask<Void, Void, OPGDownloadMedia> asyncTask = new AsyncTask<Void, Void, OPGDownloadMedia>() {
+                asyncTask = new AsyncTask<Void, Void, OPGDownloadMedia>() {
                     @Override
                     protected OPGDownloadMedia doInBackground(Void... voids) {
                         return Util.getOPGSDKInstance().downloadMediaFile(mContext, mediaId, "PNG");
@@ -454,9 +460,9 @@ public class LoginActivity extends RootActivity implements View.OnClickListener,
     {
         //plz enter the admin name and shared key of your account on OnePoint website
         //https://account.onepointglobal.com/#/login
-        OPGSDK.initialize("*****","*******",getApplicationContext());
+        OPGSDK.initialize("*****", "*****", getApplicationContext());
         //pass the required app version
-        Util.getOPGSDKInstance().setAppVersion("****", getApplicationContext());
+        Util.getOPGSDKInstance().setAppVersion("*****", getApplicationContext());
     }
 
     @Override
@@ -589,8 +595,17 @@ public class LoginActivity extends RootActivity implements View.OnClickListener,
         closeProgressDialog();
     }
 
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if(asyncTask != null)
+        {
+            asyncTask.cancel(true);
+        }
+    }
+
     private void closeProgressDialog() {
-        if(pDialog.isShowing()) {
+        if(pDialog!=null && pDialog.isShowing()) {
             pDialog.dismiss();
         }
     }
@@ -665,12 +680,13 @@ public class LoginActivity extends RootActivity implements View.OnClickListener,
 
     @Override
     public void onLoginProcessStarted() {
-        pDialog.show();
+        if(pDialog != null)
+            pDialog.show();
     }
 
     @Override
     public void onLoginProcessCompleted(OPGAuthenticate opgAuthenticate) {
-        if(pDialog.isShowing()){
+        if(pDialog != null && pDialog.isShowing()){
             pDialog.dismiss();
         }
         if(opgAuthenticate.isSuccess())

@@ -11,6 +11,7 @@ import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
@@ -150,19 +151,19 @@ public class SurveyDetailActivity extends RootActivity implements View.OnClickLi
         iff.addAction(Util.BROADCAST_ACTION_REFRESH_UPLOAD);
         iff.addAction(Util.BROADCAST_ACTION_SURVEY_UPLOADED);
         iff.addAction(Util.ACTION_SESSION_EXPIRED);
-        registerReceiver(mReceiver, iff);
+        LocalBroadcastManager.getInstance(mContext).registerReceiver(mReceiver, iff);
         onResumeActivity();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        unregisterReceiver(mReceiver);
+        LocalBroadcastManager.getInstance(mContext).unregisterReceiver(mReceiver);
     }
 
     private void displayMessage(String message){
         try {
-            Util.showMessageDialog(mContext,message);
+            Util.showMessageDialog(mContext,message,"");
         }catch (Exception e){}
     }
 

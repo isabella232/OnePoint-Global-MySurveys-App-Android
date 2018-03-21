@@ -14,6 +14,7 @@ import com.opg.pom.model.PanellistProfileFactory;
 import com.opg.pom.model.ThemeFactory;
 import com.opg.prom.model.AppNotification;
 import com.opg.prom.model.AppNotificationFactory;
+import com.opg.prom.model.GeofenceSurvey;
 import com.opg.prom.model.GeofenceSurveyFactory;
 import com.opg.prom.model.IAppNotification;
 import com.opg.prom.model.IGeofenceSurvey;
@@ -38,7 +39,7 @@ import java.util.List;
 
 public class RetriveOPGObjects {
 
-    public static OPGPanellistProfile getPanellistProfile() throws Exception {
+    public synchronized static OPGPanellistProfile getPanellistProfile() throws Exception {
         OPGPanellistProfile opgPanellistProfile = new OPGPanellistProfile();
         PanellistProfileFactory factory = new PanellistProfileFactory();
         CSList<IPanellistProfile> list = factory.findAllObjects();
@@ -61,6 +62,32 @@ public class RetriveOPGObjects {
             opgPanellistProfile.setStatusMessage("Success");
             opgPanellistProfile.setSuccess(true);
             opgPanellistProfile.setPanellistID(panellistProfile.getPanellistID());
+         /*   json.put("FirstName", panellistProfile.getFirstName());
+            json.put("LastName", panellistProfile.getLastName());
+            json.put("UserName", panellistProfile.getUserName());
+            json.put("Email", panellistProfile.getEmail());
+            json.put("Address1", panellistProfile.getAddress1());
+            json.put("Address2", panellistProfile.getAddress2());
+            json.put("PostalCode", panellistProfile.getPostalCode());
+            json.put("MobileNumber", panellistProfile.getMobileNumber());
+            json.put("CountryCode", panellistProfile.getCountryCode());
+            json.put("MediaID", panellistProfile.getMediaID());
+            json.put("Title", panellistProfile.getTitle());
+            json.put("Remark", panellistProfile.getRemark());
+            json.put("PanellistID", panellistProfile.getPanellistID());
+            json.put("SearchTag", panellistProfile.getSearchTag());
+            json.put("Website", panellistProfile.getWebsite());
+            json.put("GeoLocation", panellistProfile.getGeoLocation());
+            json.put("Status", panellistProfile.getStatus());
+            json.put("Gender", panellistProfile.getGender());
+            json.put("MaritalStatus", panellistProfile.getMaritalStatus());
+            json.put("TermsCondition", panellistProfile.getTermsCondition());
+            Log.e("DOB 1", panellistProfile.getDOB().toGMTString());
+            Log.e("DOB 2", Utils.convertToISOFromDate(panellistProfile.getDOB()));
+            json.put("DOB", Utils.convertToISOFromDate(panellistProfile.getDOB()));
+            json.put("IsDeleted", panellistProfile.getIsDeleted());
+            json.put("LastUpdatedDate", Utils.convertToISOFromDate(panellistProfile.getLastUpdatedDate()));
+            json.put("CreatedDate", Utils.convertToISOFromDate(panellistProfile.getCreatedDate()));*/
 
         } else {
             opgPanellistProfile.setStatusMessage("Error : No profile found in DB!");
@@ -75,7 +102,7 @@ public class RetriveOPGObjects {
      * @return
      * @throws Exception
      */
-    public static List<OPGSurvey> getAllSurveys() throws Exception {
+    public synchronized static List<OPGSurvey> getAllSurveys() throws Exception {
         ArrayList<OPGSurvey> opgSurveyList = new ArrayList<>();
         SurveyFactory factory = new SurveyFactory();
         if (factory.findAllObjects().size() > 0) {
@@ -116,7 +143,7 @@ public class RetriveOPGObjects {
      * @return
      * @throws Exception
      */
-    public static List<OPGSurvey> getAllSurveys(long panelID) throws Exception {
+    public synchronized static List<OPGSurvey> getAllSurveys(long panelID) throws Exception {
         List<OPGSurvey> opgSurveyList = new ArrayList<>();
         SurveyFactory factory = new SurveyFactory();
         if (factory.findAllObjects().size() > 0) {
@@ -148,7 +175,7 @@ public class RetriveOPGObjects {
      * @return
      * @throws Exception
      */
-    public static List<OPGSurvey> getGeofencingSurveys(long panelID) throws Exception {
+    public synchronized static List<OPGSurvey> getGeofencingSurveys(long panelID) throws Exception {
         List<OPGSurvey> opgSurveyList = new ArrayList<>();
         SurveyFactory factory = new SurveyFactory();
         if (factory.findAllObjects().size() > 0) {
@@ -182,7 +209,7 @@ public class RetriveOPGObjects {
      * @return
      * @throws Exception
      */
-    public static OPGPanel getPanel(long panelId) throws Exception{
+    public synchronized static OPGPanel getPanel(long panelId) throws Exception{
         OPGPanel opgPanel = new OPGPanel();
         PanelFactory factory = new PanelFactory();
         CSList<IPanel> models = factory.findByPanelID(panelId);
@@ -211,7 +238,7 @@ public class RetriveOPGObjects {
      * @return
      * @throws Exception
      */
-    public static List<OPGPanel> getPanels() throws Exception{
+    public  synchronized static List<OPGPanel> getPanels() throws Exception{
         List<OPGPanel> opgPanelsList = new ArrayList<>();
         PanelFactory factory = new PanelFactory();
         CSList<IPanel> models = factory.findAllObjects();
@@ -244,7 +271,7 @@ public class RetriveOPGObjects {
      * @return
      * @throws Exception
      */
-    public static List<OPGTheme> getThemes() throws  Exception{
+    public synchronized static List<OPGTheme> getThemes() throws  Exception{
         // Themes
         ThemeFactory factory = new ThemeFactory();
         CSList<ITheme> models = factory.findAllObjects();
@@ -272,7 +299,7 @@ public class RetriveOPGObjects {
      * @return
      * @throws Exception
      */
-    public static List<OPGTheme> getThemes(long themeTemplateID) throws Exception{
+    public synchronized static List<OPGTheme> getThemes(long themeTemplateID) throws Exception{
         ThemeFactory factory = new ThemeFactory();
         CSList<ITheme> models = factory.findByThemeTemplateID(themeTemplateID);
         List<OPGTheme> opgThemeList = new ArrayList<>();
@@ -298,7 +325,7 @@ public class RetriveOPGObjects {
      * @return
      * @throws Exception
      */
-    public static List<OPGCountry> getCountries() throws Exception{
+    public synchronized static List<OPGCountry> getCountries() throws Exception{
         CountryFactory factory = new CountryFactory();
         CSList<ICountry> countries = factory.findAllObjects();
         List<OPGCountry> opgCountries = new ArrayList<>();
@@ -319,7 +346,7 @@ public class RetriveOPGObjects {
     }
 
 
-    public static List<AppNotification> getNotificationList() throws Exception
+    public synchronized static List<AppNotification> getNotificationList() throws Exception
     {
         AppNotificationFactory factory = new AppNotificationFactory();
         CSList<IAppNotification> appNotifications = factory.findAllObjects();
@@ -338,7 +365,7 @@ public class RetriveOPGObjects {
     /**
      * Retrive the survey based on the surveyID
      */
-    public static OPGSurvey getSurvey(long surveyID) throws Exception{
+    public synchronized static OPGSurvey getSurvey(long surveyID) throws Exception{
         OPGSurvey opgSurvey = new OPGSurvey();
 
         SurveyFactory factory = new SurveyFactory();
@@ -352,7 +379,7 @@ public class RetriveOPGObjects {
     }
 
 
-    public static OPGSurvey convertSurvey2OPGSurvey(ISurvey survey) throws Exception{
+    public synchronized static OPGSurvey convertSurvey2OPGSurvey(ISurvey survey) throws Exception{
         OPGSurvey opgSurvey = new OPGSurvey();
         opgSurvey.setGeofencing(survey.getIsGeofencing());
         opgSurvey.setName(survey.getName());
@@ -367,7 +394,7 @@ public class RetriveOPGObjects {
             opgSurvey.setStatus(survey.getStatus() == null ? Util.NEW_STATUS_KEY : survey.getStatus());
         }
 
-        opgSurvey.setSurveyReference(survey.getsurveyReference());
+        opgSurvey.setSurveyReference(survey.getsurveyReference());//we are using search tags as survey reference
         opgSurvey.setSurveyID(survey.getSurveyID());
         opgSurvey.setCreatedDate(survey.getCreatedDate());
         opgSurvey.setLastUpdatedDate(survey.getLastUpdatedDate());
@@ -378,12 +405,33 @@ public class RetriveOPGObjects {
         return opgSurvey;
     }
 
+    public synchronized static OPGGeofenceSurvey convertGeofenceSurvey2OPGGeofenceSurvey(IGeofenceSurvey iGeofenceSurvey) throws Exception
+    {
+        OPGGeofenceSurvey opgGeofenceSurvey = new OPGGeofenceSurvey();
+        opgGeofenceSurvey.setSurveyName(iGeofenceSurvey.getSurveyName().replace("'","''"));
+        opgGeofenceSurvey.setSurveyID(iGeofenceSurvey.getSurveyID());
+        opgGeofenceSurvey.setSurveyReference(iGeofenceSurvey.getSurveyReference().replace("'","''"));
+        opgGeofenceSurvey.setAddress(iGeofenceSurvey.getAddress().replace("'","''"));
+        opgGeofenceSurvey.setAddressID(iGeofenceSurvey.getAddressID());
+        opgGeofenceSurvey.setLatitude(iGeofenceSurvey.getLatitude());
+        opgGeofenceSurvey.setLongitude(iGeofenceSurvey.getLongitude());
+        opgGeofenceSurvey.setGeocode(iGeofenceSurvey.getGeoCode());
+        opgGeofenceSurvey.setCreatedDate(iGeofenceSurvey.getCreatedDate());
+        opgGeofenceSurvey.setLastUpdatedDate(iGeofenceSurvey.getLastUpdatedDate());
+        opgGeofenceSurvey.setRange(iGeofenceSurvey.getRange());
+        opgGeofenceSurvey.setDistance(iGeofenceSurvey.getDistance());
+        opgGeofenceSurvey.setEntered(iGeofenceSurvey.getIsEntered());
+        opgGeofenceSurvey.setExit(iGeofenceSurvey.getIsExit());
+        opgGeofenceSurvey.setEnter(iGeofenceSurvey.getIsEnter());
+        opgGeofenceSurvey.setTimeInterval(iGeofenceSurvey.getGeofenceTimeInterval());
+        return opgGeofenceSurvey ;
+    }
     /**
      *
      * @return
      * @throws Exception
      */
-    public static List<OPGGeofenceSurvey> getOPGGeofenceSurveys() throws Exception{
+    public synchronized static List<OPGGeofenceSurvey> getOPGGeofenceSurveys() throws Exception{
         ArrayList<OPGGeofenceSurvey> opgGeofenceSurveyList = new ArrayList<>();
         GeofenceSurveyFactory factory = new GeofenceSurveyFactory();
         if (factory.findAllObjects().size() > 0) {
@@ -416,4 +464,34 @@ public class RetriveOPGObjects {
         }
         return opgGeofenceSurveyList;
     }
+
+    public synchronized static OPGGeofenceSurvey getOPGGeofenceSurveyBySurveyIDAddressID(long surveyID, long addressID)
+    {
+        OPGGeofenceSurvey opgGeofenceSurvey =  null;
+        try {
+            GeofenceSurveyFactory factory = new GeofenceSurveyFactory();
+            CSList<IGeofenceSurvey> list = factory.findByAddressIDSurveyID((int) addressID, surveyID);
+            if (list.size() > 0) {
+                GeofenceSurvey survey = (GeofenceSurvey) list.get(0);
+                opgGeofenceSurvey = convertGeofenceSurvey2OPGGeofenceSurvey(survey);
+            }
+        }catch (Exception ex)
+        {
+        }
+        return opgGeofenceSurvey;
+    }
+    /*public static long getPanellistID() {
+    long panellistID = 0;
+    try
+    {
+
+        PanellistProfileFactory panellistProfileFactory = new PanellistProfileFactory();
+        panellistID  = getPanellistProfile().getPanellistID();
+    }
+    catch (Exception ex)
+    {
+        Log.i("",ex.getLocalizedMessage());
+    }
+    return panellistID;
+  }*/
 }

@@ -512,7 +512,6 @@ public class MySurveysPreference
     {
         SharedPreferences preferences = context.getSharedPreferences(SCRIPT_PREFS_NAME, Context.MODE_PRIVATE);
         preferences.edit().putString(key,data).commit();
-        /*setProperty(context,key,data);*/
     }
 
     public static OPGScript getScriptData(Context context, String key)
@@ -522,7 +521,6 @@ public class MySurveysPreference
         try {
             Gson gson   = new Gson();
             String data = preferences.getString(key,"");
-           /* String data = getProperty(context,SCRIPT_DATA+":"+key,"");*/
             opgScript = gson.fromJson(data,OPGScript.class);
         }
         catch (Exception ex)
@@ -542,16 +540,6 @@ public class MySurveysPreference
     public static boolean isScriptDataPresent(Context context,String key){
         SharedPreferences preferences = context.getSharedPreferences(SCRIPT_PREFS_NAME, Context.MODE_PRIVATE);
         return preferences.contains(key);
-       /* boolean isPresent = false;
-        try {
-            String data = preferences.getString(SCRIPT_DATA+":"+key,"");
-            if(!data.isEmpty()){
-                isPresent = true;
-            }
-        }
-        catch (Exception ex)
-        {  }
-        return isPresent;*/
     }
 
     public static void clearScriptData(Context  context)
@@ -559,15 +547,6 @@ public class MySurveysPreference
         try
         {
             context.getSharedPreferences(SCRIPT_PREFS_NAME, Context.MODE_PRIVATE).edit().clear().commit();
-       /*     List<OPGSurvey> surveyList = RetriveOPGObjects.getAllSurveys(getCurrentPanelID(context));
-            for(OPGSurvey opgSurvey : surveyList)
-            {
-                if(opgSurvey.isOffline() && MySurveysPreference.getScriptData(context,opgSurvey.getSurveyID()+"") != null)
-                {
-                    context.getSharedPreferences(PREFS_NAME,0).edit().remove(SCRIPT_DATA+":"+opgSurvey.getSurveyID()).commit();
-                }
-            }
-*/
         }catch (Exception e){
 
         }
@@ -602,12 +581,12 @@ public class MySurveysPreference
     }
     public static void setLogoText(Context context, String logotext)
     {
-         setProperty(context,LOGO_TEXT,logotext);
+        setProperty(context,LOGO_TEXT,logotext);
     }
 
     public static String getLogoText(Context context)
     {
-       return getProperty(context,LOGO_TEXT,null);
+        return getProperty(context,LOGO_TEXT,null);
     }
 
     public static void setLastLocationKnown(Context context, String lastLocationKnow)
