@@ -9,7 +9,7 @@
         android:normalScreens="true"
         android:resizeable="true"
         android:smallScreens="true"
-        android:xlargeScreens="true"/>
+        android:xlargeScreens="true" />
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
@@ -25,9 +25,9 @@
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
-    <uses-feature android:name="android.hardware.camera" android:required="true" />
-
-
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="true" />
 
     <application
         android:name=".MySurveys"
@@ -49,6 +49,7 @@
         <activity
             android:name=".LoginActivity"
             android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize"
+            android:launchMode="singleTask"
             android:windowSoftInputMode="adjustPan" />
         <activity
             android:name="com.facebook.FacebookActivity"
@@ -63,6 +64,7 @@
         <activity
             android:name=".SplashScreenActivity"
             android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize"
+            android:launchMode="singleTask"
             android:theme="@style/AppTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -78,8 +80,7 @@
             android:windowSoftInputMode="adjustPan" />
         <activity
             android:name=".BrowseActivity"
-            android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
-            /><!-- android:windowSoftInputMode="adjustPan"-->
+            android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation" /> <!-- android:windowSoftInputMode="adjustPan" -->
 
         <service
             android:name=".FetchDataService"
@@ -126,18 +127,20 @@
             android:windowSoftInputMode="adjustPan" />
 
         <service android:name=".LocationService" />
+
         <activity
             android:name=".SignatureActivity"
-            android:label="@string/title_activity_signature"
             android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize"
-            android:windowSoftInputMode="adjustPan"
-            android:theme="@style/AppTheme">
+            android:label="@string/title_activity_signature"
+            android:theme="@style/AppTheme"
+            android:windowSoftInputMode="adjustPan">
             <intent-filter>
-                <action android:name="com.opg.my.surveys.SIGNATURE"/>
+                <action android:name="com.opg.my.surveys.SIGNATURE" />
 
-                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
+        <activity android:name=".DummyActivity"></activity>
     </application>
 
 </manifest>

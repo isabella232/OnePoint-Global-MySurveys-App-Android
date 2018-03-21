@@ -11,6 +11,7 @@ import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -52,6 +53,7 @@ public class SurveyByListFragment extends Fragment {
     private ShimmerFrameLayout mShimmerViewContainer;
     private TextView no_surveys_tv;
     private HashMap<Long, Integer> surveysPositions;
+    private boolean fetchData = true;
 
     private BroadcastReceiver mReceiver = new BroadcastReceiver() {
         @Override
@@ -61,8 +63,8 @@ public class SurveyByListFragment extends Fragment {
                 setSurveyList();
             } else if (intent.getAction().equals(Util.ACTION_UPLOAD_RESULT)) {
                 ((HomeActivity) getActivity()).showSnackBar(intent.getStringExtra("message"), Snackbar.LENGTH_LONG);
-            } else if (intent.getAction().equals(Util.BROADCAST_ACTION_REFRESH_UPLOAD)) {
-            }
+            }/* else if (intent.getAction().equals(Util.BROADCAST_ACTION_REFRESH_UPLOAD)) {
+            }*/
         }
     };
 
@@ -126,14 +128,15 @@ public class SurveyByListFragment extends Fragment {
         iff.addAction(Util.BROADCAST_ACTION_REFRESH_UPLOAD);
         iff.addAction(Util.ACTION_UPLOAD_RESULT);
         iff.addAction(Util.BROADCAST_ACTION_UPLOADED_ALL);
-        getActivity().registerReceiver(mReceiver, iff);
+        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(mReceiver, iff);
         setSurveyList();
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        getActivity().unregisterReceiver(mReceiver);
+        fetchData = false;
+        LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(mReceiver);
     }
 
     @Override
@@ -145,6 +148,7 @@ public class SurveyByListFragment extends Fragment {
     }
 
     private void setSurveyList() {
+        fetchData = true;
         if (Util.isServiceRunning(getActivity(), FetchDataService.class) || MySurveysPreference.isDownloaded(getActivity())) {
             surveysList = createDummySurveyList();
             if (Util.isServiceRunning(getActivity(), FetchDataService.class))
@@ -170,26 +174,32 @@ public class SurveyByListFragment extends Fragment {
         try {
             final long panelID = MySurveysPreference.getCurrentPanelID(getActivity());
             if (MySurveysPreference.isDownloaded(getActivity()) && panelID != 0) {
-                new Thread(new Runnable() {
+                Thread dataThread = new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        Exception exception = null;
-                        List<OPGSurvey> opgAllSurveys = null;
-                        try {
-                            opgAllSurveys = getSurveysFromDB(panelID);
-                        } catch (Exception e) {
-                            exception = e;
-                        }
-                        final List<OPGSurvey> finalOpgAllSurveys = opgAllSurveys;
-                        final Exception finalException = exception;
-                        getActivity().runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                onGetSurveysPostExecute(finalOpgAllSurveys, finalException);
+                        if (fetchData) {
+                            Exception exception = null;
+                            List<OPGSurvey> opgAllSurveys = null;
+                            try {
+                                opgAllSurveys = getSurveysFromDB(panelID);
+                            } catch (Exception e) {
+                                exception = e;
                             }
-                        });
+                            final List<OPGSurvey> finalOpgAllSurveys = opgAllSurveys;
+                            final Exception finalException = exception;
+                            if (getActivity() != null) {
+                                getActivity().runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        onGetSurveysPostExecute(finalOpgAllSurveys, finalException);
+                                    }
+                                });
+                            }
+                        }
                     }
-                }).start();
+                });
+                dataThread.setPriority(Thread.MIN_PRIORITY);
+                dataThread.start();
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -203,7 +213,7 @@ public class SurveyByListFragment extends Fragment {
                             as there may be chance of db connection issue.So we are trying multiple times*/
         int count = 0;
         for (; count < 10; count++) {
-            if (retryRetrivingData) {
+            if (retryRetrivingData && fetchData) {
                 try {
                     return RetriveOPGObjects.getAllSurveys(panelID);
                 } catch (Exception e) {
