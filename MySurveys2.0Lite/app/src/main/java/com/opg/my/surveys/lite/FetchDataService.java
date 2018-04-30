@@ -255,7 +255,7 @@ public class FetchDataService extends Service implements LoginListener{
         }
 
         public boolean getSurveys() throws OPGException {
-            ArrayList<OPGSurvey> opgSurveys = filterOnlineSurveys();
+            ArrayList<OPGSurvey> opgSurveys = Util.getOPGSDKInstance().getUserSurveyList(mContext);
             for (OPGSurvey survey:opgSurveys){
                 try {
                     boolean status = SaveOPGObjects.storeSurvey(survey);
@@ -270,19 +270,6 @@ public class FetchDataService extends Service implements LoginListener{
             }
 
             return true;
-        }
-        private ArrayList<OPGSurvey> filterOnlineSurveys() throws OPGException
-        {
-            ArrayList<OPGSurvey> surveyList = Util.getOPGSDKInstance().getUserSurveyList(mContext);
-            ArrayList<OPGSurvey> onlineSurveyList = new ArrayList<>();
-            for(OPGSurvey opgSurvey : surveyList)
-            {
-                if(!opgSurvey.isOffline())
-                {
-                    onlineSurveyList.add(opgSurvey);
-                }
-            }
-            return  onlineSurveyList;
         }
 
         public boolean getCountries() throws OPGException {
