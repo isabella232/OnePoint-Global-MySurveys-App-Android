@@ -90,6 +90,6 @@ dependencies {
     compile 'com.google.android.gms:play-services-vision:11.8.0'
     //required for db helper
     compile project(':opgdbhelper')
-    implementation project(':opgsdk_lite_v1.7')
+    compile 'com.opg.sdk:opgsdk_lite:1.8'
 }
 apply plugin: 'com.google.gms.google-services'
