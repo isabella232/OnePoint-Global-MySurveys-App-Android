@@ -14,8 +14,8 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.allatori.annotations.DoNotRename;
+import com.opg.my.surveys.lite.BuildConfig;
 import com.opg.my.surveys.lite.R;
-import com.opg.sdk.BuildConfig;
 
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.PluginResult;

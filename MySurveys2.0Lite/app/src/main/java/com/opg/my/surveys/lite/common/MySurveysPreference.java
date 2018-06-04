@@ -18,7 +18,7 @@ import java.util.List;
  */
 public class MySurveysPreference
 {
-    private final static String PREFS_NAME = "OnePointPreference";
+    private final static String PREFS_NAME = "MySurveysLitePreference";
     private final static String SCRIPT_PREFS_NAME = "OnePointScriptPreference";
     private final static String GEOFENC_PREFS_NAME = "GeofencePreference";
 
@@ -58,9 +58,12 @@ public class MySurveysPreference
     {
         if(context != null)
         {
-            context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE).edit().putString(name, value).commit();
+            try {
+                context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE).edit().putString(name, Aes256.encrypt(value)).commit();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
-
     }
 
     private static synchronized String getProperty(final Context context, final String name, final String defaultValue)
@@ -75,7 +78,7 @@ public class MySurveysPreference
             }
             else
             {
-                return value;
+                return Aes256.decrypt(value);
             }
         }
         catch (final ClassCastException e)

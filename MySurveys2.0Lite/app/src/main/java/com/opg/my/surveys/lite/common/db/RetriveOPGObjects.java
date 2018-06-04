@@ -2,6 +2,7 @@ package com.opg.my.surveys.lite.common.db;
 
 import com.opg.cs2jnet.system.collections.lcc.CSList;
 import com.opg.my.surveys.lite.BuildConfig;
+import com.opg.my.surveys.lite.common.Aes256;
 import com.opg.my.surveys.lite.common.Util;
 import com.opg.pom.model.CountryFactory;
 import com.opg.pom.model.ICountry;
@@ -45,19 +46,32 @@ public class RetriveOPGObjects {
         CSList<IPanellistProfile> list = factory.findAllObjects();
         if (list != null && list.size() > 0) {
             PanellistProfile panellistProfile = ((PanellistProfile) list.get(0));
-            opgPanellistProfile.setPostalCode(panellistProfile.getPostalCode());
+            opgPanellistProfile.setPostalCode(Aes256.decrypt(panellistProfile.getPostalCode()));
+            opgPanellistProfile.setAddress1(Aes256.decrypt(panellistProfile.getAddress1()));
+            opgPanellistProfile.setAddress2(Aes256.decrypt(panellistProfile.getAddress2()));
+            opgPanellistProfile.setEmailID(Aes256.decrypt(panellistProfile.getEmail()));
+            opgPanellistProfile.setTitle(Aes256.decrypt(panellistProfile.getTitle()));
+            opgPanellistProfile.setFirstName(Aes256.decrypt(panellistProfile.getFirstName()));
+            opgPanellistProfile.setLastName(Aes256.decrypt(panellistProfile.getLastName()));
+            opgPanellistProfile.setUserName(Aes256.decrypt(panellistProfile.getUserName()));
+            opgPanellistProfile.setMobileNumber(Aes256.decrypt(panellistProfile.getMobileNumber()));
+            opgPanellistProfile.setCountryName(Aes256.decrypt(panellistProfile.getSearchTag()));//stored countryname as searchtag
+            /*opgPanellistProfile.setPostalCode(panellistProfile.getPostalCode());
             opgPanellistProfile.setAddress1(panellistProfile.getAddress1());
             opgPanellistProfile.setAddress2(panellistProfile.getAddress2());
-            opgPanellistProfile.setDob(panellistProfile.getDOB());
             opgPanellistProfile.setEmailID(panellistProfile.getEmail());
-            opgPanellistProfile.setGender(panellistProfile.getGender());
             opgPanellistProfile.setTitle(panellistProfile.getTitle());
             opgPanellistProfile.setFirstName(panellistProfile.getFirstName());
             opgPanellistProfile.setLastName(panellistProfile.getLastName());
             opgPanellistProfile.setUserName(panellistProfile.getUserName());
-            opgPanellistProfile.setMediaID(panellistProfile.getMediaID());
             opgPanellistProfile.setMobileNumber(panellistProfile.getMobileNumber());
-            opgPanellistProfile.setCountryName(panellistProfile.getSearchTag());//stored countryname as searchtag
+            opgPanellistProfile.setCountryName(panellistProfile.getSearchTag());//stored countryname as searchtag*/
+
+            opgPanellistProfile.setDob(panellistProfile.getDOB());
+            opgPanellistProfile.setGender(panellistProfile.getGender());
+
+            opgPanellistProfile.setMediaID(panellistProfile.getMediaID());
+
             opgPanellistProfile.setStd(String.valueOf(panellistProfile.getCountryCode()));//stored stdcode as countrycode
             opgPanellistProfile.setStatusMessage("Success");
             opgPanellistProfile.setSuccess(true);
