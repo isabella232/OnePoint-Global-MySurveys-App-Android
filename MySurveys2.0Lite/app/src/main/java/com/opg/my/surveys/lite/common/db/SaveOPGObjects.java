@@ -4,6 +4,7 @@ import android.util.Log;
 
 import com.opg.cs2jnet.system.collections.lcc.CSList;
 import com.opg.my.surveys.lite.BuildConfig;
+import com.opg.my.surveys.lite.common.Aes256;
 import com.opg.my.surveys.lite.common.Util;
 import com.opg.pom.model.Country;
 import com.opg.pom.model.CountryFactory;
@@ -392,51 +393,72 @@ public class SaveOPGObjects {
      * @throws Exception
      */
     public static boolean storePanellistProfile(OPGPanellistProfile opgPanellistProfile) throws Exception {
+        //FirstName,LastName,UserName,Email,Address1,Address2,PostalCode,MobileNumber,Title,Password,SearchTag,PasswordEncrypted all these fields are encrypted.
         PanellistProfile profile = new PanellistProfile();
         PanellistProfileFactory factory = new PanellistProfileFactory();
 
+        /*profile.setFirstName((opgPanellistProfile.getFirstName().equalsIgnoreCase("null") ? ""
+                : opgPanellistProfile.getFirstName().replace("'", "''")));*/
         profile.setFirstName((opgPanellistProfile.getFirstName().equalsIgnoreCase("null") ? ""
-                : opgPanellistProfile.getFirstName().replace("'", "''")));
+                : Aes256.encrypt(opgPanellistProfile.getFirstName().replace("'", "''"))));
 
+        /*profile.setLastName((opgPanellistProfile.getLastName().equalsIgnoreCase("null") ? ""
+                : opgPanellistProfile.getLastName().replace("'", "''")));*/
         profile.setLastName((opgPanellistProfile.getLastName().equalsIgnoreCase("null") ? ""
-                : opgPanellistProfile.getLastName().replace("'", "''")));
+                : Aes256.encrypt(opgPanellistProfile.getLastName().replace("'", "''"))));
 
+        /*profile.setUserName((opgPanellistProfile.getUserName().equalsIgnoreCase("null") ? ""
+                : opgPanellistProfile.getUserName().replace("'", "''")));*/
         profile.setUserName((opgPanellistProfile.getUserName().equalsIgnoreCase("null") ? ""
-                : opgPanellistProfile.getUserName().replace("'", "''")));
+                : Aes256.encrypt(opgPanellistProfile.getUserName().replace("'", "''"))));
 
 
+        /*profile.setEmail((opgPanellistProfile.getEmailID().equalsIgnoreCase("null") ? ""
+                : opgPanellistProfile.getEmailID().replace("'", "''")));*/
         profile.setEmail((opgPanellistProfile.getEmailID().equalsIgnoreCase("null") ? ""
-                : opgPanellistProfile.getEmailID().replace("'", "''")));
+                : Aes256.encrypt(opgPanellistProfile.getEmailID().replace("'", "''"))));
 
+        /*profile.setAddress1((opgPanellistProfile.getAddress1().equalsIgnoreCase("null") ? ""
+                : opgPanellistProfile.getAddress1().replace("'", "''")));*/
         profile.setAddress1((opgPanellistProfile.getAddress1().equalsIgnoreCase("null") ? ""
-                : opgPanellistProfile.getAddress1().replace("'", "''")));
+                : Aes256.encrypt(opgPanellistProfile.getAddress1().replace("'", "''"))));
 
+        /*profile.setAddress2((opgPanellistProfile.getAddress2().equalsIgnoreCase("null") ? ""
+                : opgPanellistProfile.getAddress2().replace("'", "''")));*/
         profile.setAddress2((opgPanellistProfile.getAddress2().equalsIgnoreCase("null") ? ""
-                : opgPanellistProfile.getAddress2().replace("'", "''")));
+                : Aes256.encrypt(opgPanellistProfile.getAddress2().replace("'", "''"))));
 
+        /*profile.setPostalCode((opgPanellistProfile.getPostalCode().equalsIgnoreCase("null") ? ""
+                : opgPanellistProfile.getPostalCode()).replace("'", "''"));*/
         profile.setPostalCode((opgPanellistProfile.getPostalCode().equalsIgnoreCase("null") ? ""
-                : opgPanellistProfile.getPostalCode()).replace("'", "''"));
+                : Aes256.encrypt(opgPanellistProfile.getPostalCode()).replace("'", "''")));
 
+        /*profile.setMobileNumber((opgPanellistProfile.getMobileNumber().equalsIgnoreCase("null") ? ""
+                : opgPanellistProfile.getMobileNumber()));*/
         profile.setMobileNumber((opgPanellistProfile.getMobileNumber().equalsIgnoreCase("null") ? ""
-                : opgPanellistProfile.getMobileNumber()));
+                : Aes256.encrypt(opgPanellistProfile.getMobileNumber())));
 
 
         profile.setMediaID((opgPanellistProfile.getMediaID().equalsIgnoreCase("null") ? ""
                 : opgPanellistProfile.getMediaID()));
 
+        /*profile.setTitle((opgPanellistProfile.getTitle().equalsIgnoreCase("null") ? ""
+                : opgPanellistProfile.getTitle().replace("'", "''")));*/
         profile.setTitle((opgPanellistProfile.getTitle().equalsIgnoreCase("null") ? ""
-                : opgPanellistProfile.getTitle().replace("'", "''")));
-
-
-
+                : Aes256.encrypt(opgPanellistProfile.getTitle().replace("'", "''"))));
 
         profile.setGender((String.valueOf(opgPanellistProfile.getGender()).equalsIgnoreCase("null") ? -1
                 : (short)opgPanellistProfile.getGender()));
 
         profile.setDOB(opgPanellistProfile.getDob());
 
+       /*profile.setDOB(Utils.convertToDateFromUTC(opgPanellistProfile.get("DOB").toString()));
+        profile.setCreatedDate(Utils.convertToDateFromUTC(opgPanellistProfile.get("CreatedDate").toString()));
+        profile.setLastUpdatedDate(Utils.convertToDateFromUTC(opgPanellistProfile.get("LastUpdatedDate").toString()));
+        profile.setPasswordLastUpdated(Utils.convertToDateFromUTC(opgPanellistProfile.get("PasswordLastUpdated").toString()));*/
         //values to be included in the OPGPanellistProfile class
-        profile.setPassword("@xyze");
+        /* profile.setPassword("@xyze");*/
+        profile.setPassword(Aes256.encrypt("@xyze"));
 
         profile.setCreatedDate(opgPanellistProfile.getDob());
         profile.setLastUpdatedDate(opgPanellistProfile.getDob());
@@ -448,7 +470,8 @@ public class SaveOPGObjects {
 
         profile.setPanellistID(opgPanellistProfile.getPanellistID());
 
-        profile.setSearchTag(opgPanellistProfile.getCountryName().replace("'", "''"));//using the searchtag for storing the countryname
+        //profile.setSearchTag(opgPanellistProfile.getCountryName().replace("'", "''"));//using the searchtag for storing the countryname
+        profile.setSearchTag(Aes256.encrypt(opgPanellistProfile.getCountryName().replace("'", "''")));//using the searchtag for storing the countryname
 
         profile.setWebsite("www.www.com".replace("'", "''"));
 
@@ -458,7 +481,8 @@ public class SaveOPGObjects {
 
 
         profile.setMaritalStatus((short) 0);
-        profile.setPasswordEncrypted("@LDJDKLJ");
+        /*profile.setPasswordEncrypted("@LDJDKLJ");*/
+        profile.setPasswordEncrypted(Aes256.encrypt("@LDJDKLJ"));
         profile.setTermsCondition(true);
 
         CSList<IPanellistProfile> list;
@@ -473,6 +497,34 @@ public class SaveOPGObjects {
         }else{
             profile.setIsNew(true);
         }
+        /*if (OPGSharedPreference.getCheckForUpdatesPlugin((Activity) OPGApplication.getActivityContext())) {
+            LogManager.getLogger(OPGJsonToModelParser.class).debug("PARSER - PanellistProfile: CHECK FOR UPDATE.");
+            if (Config.CHECK_FOR_UPDATES_FULL_REPLACEMENT) {
+                for (IPanellistProfile oldProfile : factory.findAllObjects()) {
+                    factory.delete((PanellistProfile) oldProfile);
+                }
+                factory.save(profile);
+            } else if (factory.findAllObjects().size() > 0) {
+                Date dbLastUpdated = factory.findAllObjects().get(0).getLastUpdatedDate();
+                Date nwLastUpdated = profile.getLastUpdatedDate();
+                boolean needUpdate = (dbLastUpdated.compareTo(nwLastUpdated) < 0);
+                if (needUpdate) {
+                    profile.setIsNew(false);
+                    factory.save(profile);
+                }
+            } else {
+                factory.save(profile);
+            }
+        } else {
+            LogManager.getLogger(OPGJsonToModelParser.class).debug("PARSER - PanellistProfile: NORMAL");
+            try {
+                factory.save(profile);
+            } catch (NullPointerException e) {
+                LogManager.getLogger(OPGJsonToModelParser.class).error("Duplicate Insert!");
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }*/
         return  factory.save(profile);
     }
 
