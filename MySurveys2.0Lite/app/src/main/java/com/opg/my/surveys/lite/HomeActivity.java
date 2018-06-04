@@ -63,7 +63,6 @@ import com.opg.my.surveys.lite.common.MySurveysPreference;
 import com.opg.my.surveys.lite.common.Util;
 import com.opg.my.surveys.lite.common.db.RetriveOPGObjects;
 import com.opg.my.surveys.lite.common.db.SaveOPGObjects;
-import com.opg.sdk.BuildConfig;
 import com.opg.sdk.OPGSDK;
 import com.opg.sdk.exceptions.OPGException;
 import com.opg.sdk.geofence.OPGGeofenceTriggerEvents;
@@ -478,6 +477,9 @@ public class HomeActivity extends AppCompatActivity implements OPGGeofenceTrigge
         try {
             File mySurveysMediaPath = new File(Environment.getExternalStorageDirectory() + "/MySurveys/Theme/");
             boolean delMySurveysMedPth = deleteDirectory(mContext, mySurveysMediaPath);
+            //FilePath related to the profile files in the mysurveys app
+            File mySurveysProfileImagePath = new File(Environment.getExternalStorageDirectory() + "/MySurveys/Profile/");
+            boolean delMProfileMedPth = deleteDirectory(mContext, mySurveysProfileImagePath);
         }catch (Exception e){
             if(BuildConfig.DEBUG){
                 Log.d(TAG,"Delete Exception"+e.toString());

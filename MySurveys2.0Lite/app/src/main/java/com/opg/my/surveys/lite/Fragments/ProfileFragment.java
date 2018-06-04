@@ -11,7 +11,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
-
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.media.ExifInterface;
@@ -51,6 +50,8 @@ import com.opg.my.surveys.lite.CountryActivity;
 import com.opg.my.surveys.lite.FetchDataService;
 import com.opg.my.surveys.lite.HomeActivity;
 import com.opg.my.surveys.lite.LoginActivity;
+import com.opg.my.surveys.lite.R;
+import com.opg.my.surveys.lite.common.Aes256;
 import com.opg.my.surveys.lite.common.MySurveysPreference;
 import com.opg.my.surveys.lite.common.RoundedImageView;
 import com.opg.my.surveys.lite.common.Util;
@@ -60,8 +61,6 @@ import com.opg.sdk.exceptions.OPGException;
 import com.opg.sdk.models.OPGDownloadMedia;
 import com.opg.sdk.models.OPGPanellistProfile;
 import com.opg.sdk.models.OPGUpdatePanellistProfile;
-import com.opg.my.surveys.lite.R;
-
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -71,7 +70,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Locale;
-
 
 import OnePoint.Common.Utils;
 import OnePoint.CordovaPlugin.Utils.FileUtils;
@@ -104,20 +102,20 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
     private Dialog progressDialog;
     private Dialog selectImageDialog;
     private String fileName ;
-    private  File saveFile;// =  new File(Environment.getExternalStorageDirectory().getAbsolutePath()+File.separator+ Utils.getApplicationName(getActivity())+File.separator+Util.PROFILE_PICS, fileName);
+    private File saveFile;// =  new File(Environment.getExternalStorageDirectory().getAbsolutePath()+File.separator+ Utils.getApplicationName(getActivity())+File.separator+Util.PROFILE_PICS, fileName);
 
     private boolean updatedCountry = false;
 
     private boolean canUpload = true;
     private boolean isGallery = false;
-    public  String IMAGE_REGEX = "%%0%dd";
+    public String IMAGE_REGEX = "%%0%dd";
     public static final String IMAGE_GALLERY_       = "image_gallery_";
-    public  String JPEG = ".jpeg";
+    public String JPEG = ".jpeg";
     private String tempDir = "temp/";
     private String imagesDir = "/images/";
-    public  String CANNOT_CREATE_DIR      = "Cannot create dir ";
+    public String CANNOT_CREATE_DIR      = "Cannot create dir ";
     private String _currentMediaPath = "";
-    private static int MAX_IMAGE_SIZE = 2 * 1024 * 1024;//size in bytes
+    private static int MAX_IMAGE_SIZE = 1 * 1024 * 1024;//size in bytes
     private boolean fetchData = true;
 
     private BroadcastReceiver mReceiver = new BroadcastReceiver() {
@@ -231,7 +229,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
             }
 
             @Override
-            public void onUploadCompleted(String mediaID,String picturePath,String errorMessage) {
+            public void onUploadCompleted(String mediaID, String picturePath, String errorMessage) {
                 canUpload = true;
                 try{
                     if (progressBar != null) {
@@ -247,6 +245,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
                             file.delete();
                         }
                         picturePath = Util.searchFile(getActivity(),mediaID,Util.PROFILE_PICS);
+                        encryptFile(picturePath);
                         setProfileImage(picturePath,false);
                     }
                     else if(errorMessage.equals(Util.SESSION_TIME_OUT_ERROR))
@@ -424,7 +423,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         }
     }
 
-    private void setProfileImage(final String profilePicPath,final boolean retry)
+    private void setProfileImage(final String profilePicPath, final boolean retry)
     {
         if (progressBar != null) {
             progressBar.setVisibility(View.VISIBLE);
@@ -435,20 +434,20 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
                 @Override
                 public void run() {
                     try {
-                        if(imgProfile!=null) {
+                        if(imgProfile!=null && profilePicPath!=null) {
+                            /*String desFilePath = decryptFile(profilePicPath);*/
                             // First decode with inJustDecodeBounds=true to check dimensions
                             final BitmapFactory.Options options = new BitmapFactory.Options();
                             options.inJustDecodeBounds = true;
-                            BitmapFactory.decodeFile(profilePicPath, options);
-
-
                             // Calculate inSampleSize
                             options.inSampleSize = calculateInSampleSize(options, imgProfile.getMeasuredWidth(), imgProfile.getMeasuredHeight());
-
                             // Decode bitmap with inSampleSize set
                             options.inJustDecodeBounds = false;
-                            final Bitmap bitmap = BitmapFactory.decodeFile(profilePicPath, options);
-
+                            /*final Bitmap bitmap = BitmapFactory.decodeFile(desFilePath, options);
+                            deleteFile(desFilePath);*/
+                            //Decrypting the bytearray of the image from the encrypted
+                            byte[] decryptArray = Aes256.decryptFileData(profilePicPath);
+                            final Bitmap bitmap = BitmapFactory.decodeByteArray(decryptArray, 0, decryptArray.length,options);
                             getActivity().runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
@@ -482,6 +481,12 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
             },500);
         }
     }
+
+    private boolean deleteFile(String desFilePath) {
+        File file = new File(desFilePath);
+        return file.delete();
+    }
+
     @Override
     public void onClick(View view) {
         if(Util.isOnline(getActivity()))
@@ -719,7 +724,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
             selectImageDialog.dismiss();
         }
         else {
-            ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.CAMERA,Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_CODE_PROFILE);
+            ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_CODE_PROFILE);
         }
     }
 
@@ -847,7 +852,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         }
     }
 
-    public class DownloadProfilePic extends AsyncTask<String, Void, OPGDownloadMedia>{
+    public class DownloadProfilePic extends AsyncTask<String, Void, OPGDownloadMedia> {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
@@ -865,10 +870,12 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
             super.onPostExecute(opgDownloadMedia);
             if(progressBar != null)
                 progressBar.setVisibility(View.INVISIBLE);
-            if(opgDownloadMedia != null && opgDownloadMedia.getMediaPath() != null)
+            if(opgDownloadMedia != null && opgDownloadMedia.getMediaPath() != null && panellistProfile!=null && panellistProfile.getMediaID()!= null && !panellistProfile.getMediaID().isEmpty())
             {
                 String mediaPath = Util.moveFile(getActivity(),opgDownloadMedia.getMediaPath(),panellistProfile.getMediaID(),Util.PROFILE_PICS);
+                encryptFile(mediaPath);
                 setProfileImage(mediaPath,false);
+                deleteFile(opgDownloadMedia.getMediaPath());
             }
             else
             {
@@ -877,7 +884,14 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         }
     }
 
-    private class UpdatePanellistProfile extends AsyncTask<OPGPanellistProfile, Void, OPGUpdatePanellistProfile>{
+    private void encryptFile(String mediaPath) {
+        File profileImage = new File(mediaPath);
+        String filePath = profileImage.getAbsolutePath().split(panellistProfile.getMediaID())[0];
+        String fileName = profileImage.getName();
+        Aes256.encryptFile(mediaPath,filePath,fileName);
+    }
+
+    private class UpdatePanellistProfile extends AsyncTask<OPGPanellistProfile, Void, OPGUpdatePanellistProfile> {
 
         OPGPanellistProfile panellistProfile;
 
@@ -1090,7 +1104,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
             FileOutputStream out = null;
             String filename = null;
             if (isGallery) {
-                File vitaccessMediaDir = new File(Environment.getExternalStorageDirectory()+ File.separator + Utils.getApplicationName(getActivity())+File.separator+tempDir);
+                File vitaccessMediaDir = new File(Environment.getExternalStorageDirectory()+ File.separator + Utils.getApplicationName(getActivity())+ File.separator+tempDir);
                 File vitaccessMediaImageDir = new File(vitaccessMediaDir + imagesDir);
                 if (!vitaccessMediaImageDir.exists()) {
                     vitaccessMediaImageDir.mkdirs();

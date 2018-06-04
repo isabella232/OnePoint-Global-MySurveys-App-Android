@@ -460,9 +460,9 @@ public class LoginActivity extends RootActivity implements View.OnClickListener,
     {
         //plz enter the admin name and shared key of your account on OnePoint website
         //https://account.onepointglobal.com/#/login
-        OPGSDK.initialize("*****", "*****-*****-*****-*****-*****", getApplicationContext());
+        OPGSDK.initialize("****", "****-****-****-****-****", getApplicationContext());
         //pass the required app version
-        Util.getOPGSDKInstance().setAppVersion("*****", getApplicationContext());
+        Util.getOPGSDKInstance().setAppVersion("your-app-version", getApplicationContext());
     }
 
     @Override
