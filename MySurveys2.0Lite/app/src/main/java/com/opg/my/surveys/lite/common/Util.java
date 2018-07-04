@@ -87,6 +87,7 @@ public class Util
     public static String POSITION = "position";
 
     public static String SURVEY_REF = "SurveyReference";
+    public static String DEEP_LINKING_KEY = "deeplinking";
 
     public static final String SESSION_TIME_OUT_ERROR = "Session expired.Please authenticate again";
     public static final String NO_INTERNET_ERROR="No address associated with hostname";

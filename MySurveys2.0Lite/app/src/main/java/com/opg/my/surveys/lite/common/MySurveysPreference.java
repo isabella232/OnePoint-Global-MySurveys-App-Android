@@ -50,6 +50,7 @@ public class MySurveysPreference
     private final static String LOGO_TEXT = "LogoText";
     private final static String LAST_LOCATION_KNOWN = "lastLocationKnown";
     private final static String IS_GEOFENCE_SURVEY_ENABLED = "isSurveyGeofenceEnabled";
+    private final static String IS_PERMISSIONS_REQUESTED = "isPermissionsRequested";
 
 
 
@@ -457,6 +458,24 @@ public class MySurveysPreference
         setProperty(context,IS_GEOFENCING_ENABLED ,isGeofencingEnabled);
     }
 
+    /**
+     * Sets the permissions are already requested or not
+     * @param context
+     * @param isPermissionsRequested
+     */
+    public static void setPermissionsRequested(Context context,boolean isPermissionsRequested){
+        setProperty(context,IS_PERMISSIONS_REQUESTED ,isPermissionsRequested);
+    }
+
+    /**
+     * Gets the permissions are already requested or not
+     * @param context
+     * @return
+     */
+    public static boolean isPermissionsRequested(Context context){
+        boolean isPermissionsRequested = getProperty(context, IS_PERMISSIONS_REQUESTED, false);
+        return isPermissionsRequested;
+    }
 
     /**
      *Gets the List of geofences List<Geofence> from the sharedpreferences

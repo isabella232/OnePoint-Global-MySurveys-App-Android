@@ -446,6 +446,7 @@ public class LoginActivity extends RootActivity implements View.OnClickListener,
                 }
         );
     }
+
     private void setTypeface()
     {
         Util.setTypeface(mContext,txtUsername,"font/roboto_regular.ttf");
@@ -454,15 +455,6 @@ public class LoginActivity extends RootActivity implements View.OnClickListener,
         Util.setTypeface(mContext,btnLogin,"font/roboto_bold.ttf");
         Util.setTypeface(mContext,btnFacebookLogin,"font/roboto_medium.ttf");
         Util.setTypeface(mContext,btnGooglePlusLogin,"font/roboto_medium.ttf");
-    }
-
-    private void sdkInitialize() throws Exception
-    {
-        //plz enter the admin name and shared key of your account on OnePoint website
-        //https://account.onepointglobal.com/#/login
-        OPGSDK.initialize("****", "****-****-****-****-****", getApplicationContext());
-        //pass the required app version
-        Util.getOPGSDKInstance().setAppVersion("your-app-version", getApplicationContext());
     }
 
     @Override
