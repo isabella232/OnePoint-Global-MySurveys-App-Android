@@ -20,6 +20,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.opg.my.surveys.lite.common.Util;
+import com.opg.sdk.OPGSDK;
 
 public class RootActivity extends AppCompatActivity {
 
@@ -108,4 +109,14 @@ public class RootActivity extends AppCompatActivity {
         if(view instanceof TextInputLayout)
             ((TextInputLayout)view).setTypeface(myTypeface);
     }
+
+    protected void sdkInitialize() throws Exception
+    {
+        //plz enter the admin name and shared key of your account on OnePoint website
+        //https://account.onepointglobal.com/#/login
+        OPGSDK.initialize("****", "****-****-****-****-****", getApplicationContext());
+        //pass the required app version
+        Util.getOPGSDKInstance().setAppVersion("your-app-version", getApplicationContext());
+    }
+
 }
