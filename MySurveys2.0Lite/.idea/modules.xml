@@ -5,7 +5,6 @@
       <module fileurl="file://$PROJECT_DIR$/MySurveys2.0Lite.iml" filepath="$PROJECT_DIR$/MySurveys2.0Lite.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/opgdbhelper/opgdbhelper.iml" filepath="$PROJECT_DIR$/opgdbhelper/opgdbhelper.iml" />
-      <module fileurl="file://$PROJECT_DIR$/opgsdk_lite_v1.9/opgsdk_lite_v1.9.iml" filepath="$PROJECT_DIR$/opgsdk_lite_v1.9/opgsdk_lite_v1.9.iml" />
     </modules>
   </component>
 </project>

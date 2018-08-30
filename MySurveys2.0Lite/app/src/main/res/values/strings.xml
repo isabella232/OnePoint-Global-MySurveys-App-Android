@@ -1,9 +1,9 @@
 <resources>
-    <string name="app_name" translatable="false">My Surveys Lite</string>
+    <string name="app_name" translatable="false">My Surveys</string>
 
-    <string name="facebook_app_id" translatable="false">****</string>
-    <string name="google_map_api_key" translatable="false">****</string>
-    <string name="server_client_id" translatable="false">*****</string>
+    <string name="facebook_app_id" translatable="false">1830580473618949</string><!--268469490214857--> <!--241219919681635-->
+    <string name="google_map_api_key" translatable="false">AIzaSyBqk-WXQspzd-8dbbgnUZ_Q4dH6tOXMoSs</string><!--AIzaSyDzvVgKjzdYeyBLzRt6HI0H8ymcioUDb-U,,AIzaSyCGkPYmTXOpbqcUJ9eWxMl3zRcT_aofBUQ-->
+    <string name="server_client_id" translatable="false">913162180312-fp8uakrmkqjh0un3truq3caa1vljduug.apps.googleusercontent.com</string><!--755378484290-j4crpsoetruj64dp4tad5vl7fcir3ebp.apps.googleusercontent.com-->
 
     <!--LogIn Page*****************************************-->
     <string name="sign_in_facebook">Login with Facebook</string>
@@ -28,8 +28,9 @@
     <string name="err_invalid_email_id">Please enter a valid e-mail ID.</string>
     <string name="err_empty_email_id">Please enter your Email ID</string>
 
-    <string name="msg_success_mail">"Success! Please check e-your mail for new password! "</string>
+    <string name="msg_success_mail">"Success!  Please check your e-mail for new password! "</string>
     <string name="unknown_error">Oops! unknown error. Please try again</string>
+
 
 
     <!--SurveyPage***********************-->
@@ -49,7 +50,7 @@
 
     <!--SurveyByLocation Page*************************-->
     <string name="enable_geo_location">To take location based surveys turn on \'Geolocation\' from the App settings</string>
-    <string name="enter_survey_location" translatable="false">Entered the survey location - </string>
+    <string name="enter_survey_location">"You just entered the survey location - "</string>
     <string name="geofence_survey_panel_error">Selected survey is not under current Panel. Please change the panel to take survey!</string>
     <string name="welcome_message_survey">Welcome! You have a survey here!</string>
     <string name="survey_range_error">You are not in this location to take the survey!</string>
@@ -61,7 +62,7 @@
     <string name="take_trial">Take a Trial </string>
     <string name="approx_time">Approximately</string>
     <string name="min_time">min</string>
-    <string name="nooftimtak_str">Number of times taken</string>
+    <string name="nooftimtak_str">Surveys to upload</string><!--Number of times taken-->
     <!-- <string name="status_sep_str">Status</string>-->
 
     <string name="unscheduled_str">Unscheduled</string>
@@ -92,7 +93,7 @@
     <string name="cancel">Cancel</string>
     <string name="err_empty_pwd">Password cannot be empty</string>
     <string name="err_new_and_confirm_pwd_not_same">New and Confirm passwords should be same</string>
-    <string name="err_old_and_new_pwd_same">Old and new password cannot be same</string>
+    <string name="err_old_and_new_pwd_same">Old and new passwords cannot be same</string>
     <string name="forgot_password_title">We will email you a link to reset your password</string>
     <string name="current_password_does_not_exist">Current Password does not exist</string>
 
@@ -138,35 +139,35 @@
     <string name="please_wait">Please wait.</string>
 
     <!--Update Google Play Services-->
-    <string name="update_google_play_service" translatable="false">Update Google Play Services to get location based surveys </string>
-    <string name="update" translatable="false">Update</string>
+    <string name="update_google_play_service">Update Google Play Services to get location based surveys </string>
+    <string name="update">Update</string>
 
     <!--Runtime Permission Dialog-->
-    <string name="runtime_permission" translatable="false">Your permission required.</string>
-    <string name="storage_permission" translatable="false">This lets My Surveys to download and store the offline surveys.</string>
-    <string name="camera_permission" translatable="false">This lets you use camera inside of My Surveys.</string>
-    <string name="gallery_permission" translatable="false">This lets My Surveys to store and access information like photos on your phone and it\'s SD Card.</string>
-    <string name="location_permission" translatable="false">We need to access your location in order to display location based survey.</string>
-    <string name="allow" translatable="false">allow</string>
+    <string name="runtime_permission">Your permission required.</string>
+    <string name="storage_permission">This lets My Surveys to download and store the offline surveys.</string>
+    <string name="camera_permission">This lets you use camera inside of My Surveys.</string>
+    <string name="gallery_permission">This lets My Surveys to store and access information like photos on your phone and it\\\'s SD Card.</string>
+    <string name="location_permission">"My Surveys App would like to access your location to trigger location based surveys. "</string>
+    <string name="allow">allow</string>
 
     <!--Runtime Permissions -->
-    <string name="storage_permission_msg" translatable="false">Requires storage permissions to take the survey.As the survey needs to access the files, photos etc.</string>
-    <string name="access_permission_msg" translatable="false">Requires storage permissions to access the files, photos ,videos etc.</string>
-    <string name="location_permission_msg" translatable="false">Requires location permission to access the location.</string>
-    <string name="camera_permission_msg" translatable="false">Requires camera permission to capture an image.</string>
-    <string name="audio_permission_msg" translatable="false">Requires record audio permission to record the audio.</string>
-    <string name="record_permission_msg" translatable="false">Requires camera and audio permissions to record the video.</string>
-    <string name="app_settings" translatable="false">App Settings</string>
-    <string name="activate_storage_msg" translatable="false">Activate storage under the permissions menu.</string>
-    <string name="deny" translatable="false">Deny</string>
+    <string name="storage_permission_msg">Requires storage permissions to take the survey.As the survey needs to access the files, photos etc.</string>
+    <string name="access_permission_msg">Requires storage permissions to access the files, photos ,videos etc.</string>
+    <string name="location_permission_msg">Requires location permission to access the location.</string>
+    <string name="camera_permission_msg">Requires camera permission to capture an image.</string>
+    <string name="audio_permission_msg">Requires record audio permission to record the audio.</string>
+    <string name="record_permission_msg">Requires camera and audio permissions to record the video.</string>
+    <string name="app_settings">App Settings</string>
+    <string name="activate_storage_msg">Activate storage under the permissions menu.</string>
+    <string name="deny">Deny</string>
 
     <!--Geofencing Strings -->
     <string name="gps_network_not_enabled">Location services not enabled.Please enable it.</string>
     <string name="open_location_settings">Location Settings</string>
     <string name="welcome_to">Welcome to</string>
     <string name="geofence_noti_msg">You have survey available at this location</string>
-    <string name="survey_available" translatable="false">You have survey available.</string>
-    <string name="thank_you_for_visiting" translatable="false">Thank You for visiting</string>
+    <string name="survey_available">You have survey available.</string>
+    <string name="thank_you_for_visiting">Thank You for visiting</string>
 
     <string name="take_survey">Take Survey</string>
 
@@ -177,28 +178,45 @@
     <string name="err_upload_survey_failed">Results upload failed</string>
     <string name="success_results_uploaded">Results are Uploaded</string>
 
-    <string name="reason_str">Reason:</string>
-    <string name="session_expired_login_again" translatable="false">Session expired.Please login again</string>
-    <string name="clear" translatable="false">Clear</string>
-    <string name="sign_here_title" translatable="false">Please sign here</string>
-    <string name="title_activity_signature" translatable="false">Signature</string>
-    <string name="title_activity_currency" translatable="false">Currency</string>
+    <string name="reason_str" >Reason:</string>
+    <string name="session_expired_login_again">Session expired. Please login again</string>
+    <string name="clear">Clear</string>
+    <string name="sign_here_title">Please sign here</string>
+    <string name="title_activity_signature">Signature</string>
+    <string name="title_activity_currency">Currency</string>
     <string name="default_currency_value" translatable="false">0.00</string>
-    <string name="ok_str" translatable="false">OK</string>
+    <string name="ok_str">OK</string>
 
 
-    <string name="ok" translatable="false">OK</string>
-    <string name="permission_camera_rationale" translatable="false">Access to the camera is needed for detection</string>
-    <string name="no_camera_permission" translatable="false">This application cannot run because it does not have the camera permission.  The application will now exit.</string>
-    <string name="low_storage_error" translatable="false">Ocr dependencies cannot be downloaded due to low device storage</string>
-    <string name="title_activity_main" translatable="false">Ocr Detector Sample</string>
-    <string name="ocr_header" translatable="false">Click &quot;Detect Text&quot; to detect text</string>
-    <string name="read_text" translatable="false">Detect Text</string>
-    <string name="auto_focus" translatable="false">Auto Focus</string>
-    <string name="use_flash" translatable="false">Use Flash</string>
-    <string name="ocr_success" translatable="false">Text read successfully</string>
-    <string name="ocr_failure" translatable="false">No text captured</string>
-    <string name="ocr_error" translatable="false"> "Error reading text: %1$s"</string>
-    <string name="ocr_capture_msg" translatable="false">Tap to capture. Pinch/Stretch to zoom</string>
+    <string name="ok">OK</string>
+    <string name="permission_camera_rationale">Requires camera permission to capture an image.</string>
+    <string name="no_camera_permission">This application cannot run because it does not have the camera permission. The application will now exit.</string>
+    <string name="low_storage_error">OCR dependencies cannot be downloaded due to low device storage</string>
+    <!--<string name="title_activity_main" translatable="false" >Ocr Detector Sample</string>-->
+    <string name="read_text">Detect Text</string>
+    <string name="auto_focus">Auto Focus</string>
+    <string name="use_flash">Use Flash</string>
+    <string name="ocr_success">Text read successfully</string>
+    <string name="ocr_failure">No text captured</string>
+    <string name="ocr_error"> "Error reading text: %1$s"</string>
+    <string name="ocr_capture_msg">Tap to capture. Pinch/Stretch to zoom</string>
+    <string name="ocr_header">Click &quot;Detect Text&quot; to detect text</string>
+
+
+    <!-- new strings added -->
+    <string name="remove">Remove</string>
+    <string name="upload_count_str" >Surveys to upload</string>
+    <!-- Error messages -->
+    <string name="load_survey_err" >An error occurred while loading the survey</string>
+    <string name="deeplinkurl_err">Failed to load the request</string>
+    <string name="changepwd_unknown_err">An error occurred while changing the password</string>
+    <string name="upd_prf_unknown_err">An error occurred while updating the profile</string>
+    <string name="upd_prf_img_err">An error occurred while updating the profile picture</string>
+    <string name="prf_img_path_err">The image is not found</string>
+    <string name="frgt_pwd_unknown_err">An error occurred while trying to send an email to reset the password</string>
+    <string name="login_unknown_err">Authentication Failed. Please try again</string>
+    <!--Strings for app update dialog-->
+    <!--<string name="update_dialog_title" translatable="false">App update</string>
+    <string name="update_dialog_message" translatable="false">An new app update is available on Play Store.</string>-->
 
 </resources>

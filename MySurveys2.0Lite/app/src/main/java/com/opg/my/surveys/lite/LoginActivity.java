@@ -66,17 +66,16 @@ import java.util.List;
 
 import OnePoint.Common.Utils;
 
-public class LoginActivity extends RootActivity implements View.OnClickListener, GoogleApiClient.OnConnectionFailedListener,LoginListener
-{
+public class LoginActivity extends RootActivity implements View.OnClickListener, GoogleApiClient.OnConnectionFailedListener, LoginListener {
 
     private static final int RC_SIGN_IN = 9001;
     final private int REQUEST_CODE_ASK_MULTIPLE_PERMISSIONS = 124;
     private TextInputLayout inputLayoutUsername, inputLayoutPassword;
-    private TextView btnForgotPassword,btnLogin, btnFacebookLogin, btnGooglePlusLogin, tvHeaderText;
+    private TextView btnForgotPassword, btnLogin, btnFacebookLogin, btnGooglePlusLogin, tvHeaderText;
     private EditText txtUsername, txtPassword;
     private Context mContext;
     private String fbAccessToken, googleAuthCode;
-    private static  GoogleApiClient mGoogleApiClient;
+    private static GoogleApiClient mGoogleApiClient;
     private CallbackManager callbackManager;
     private LoginType loginType;
     private ImageView ivLogo;
@@ -99,10 +98,10 @@ public class LoginActivity extends RootActivity implements View.OnClickListener,
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        overridePendingTransition(android.R.anim.fade_in,android.R.anim.fade_out);
+        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
         setContentView(R.layout.activity_login);
         mContext = this;
-        if(!Util.isTablet(mContext)){
+        if (!Util.isTablet(mContext)) {
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         }
         coordinatorLayout = (CoordinatorLayout) findViewById(R.id.coordinatorLayout);
@@ -114,14 +113,14 @@ public class LoginActivity extends RootActivity implements View.OnClickListener,
         btnLogin = (TextView) findViewById(R.id.btn_login);
         txtUsername = (EditText) findViewById(R.id.et_username);
         txtPassword = (EditText) findViewById(R.id.et_password);
-        ivLogo = (ImageView)findViewById(R.id.iv_logo);
-        tvHeaderText =(TextView)findViewById(R.id.tv_header_login);
-        Util.setTypeface(this,tvHeaderText,"font/roboto_bold.ttf");
+        ivLogo = (ImageView) findViewById(R.id.iv_logo);
+        tvHeaderText = (TextView) findViewById(R.id.tv_header_login);
+        Util.setTypeface(this, tvHeaderText, "font/roboto_bold.ttf");
         txtPassword.setTransformationMethod(new PasswordTransformationMethod());
         listPermissionsNeeded = new ArrayList<>();
         checkPermission(true);
         setTypeface();
-        setDrawable(ContextCompat.getDrawable(mContext,R.drawable.splash_nologo),coordinatorLayout);
+        setDrawable(ContextCompat.getDrawable(mContext, R.drawable.splash_nologo), coordinatorLayout);
 
         try {
             pDialog = Util.getProgressDialog(mContext);
@@ -130,10 +129,9 @@ public class LoginActivity extends RootActivity implements View.OnClickListener,
         }
 
         //hiding the actionbar
-        if(getActionBar() != null) {
+        if (getActionBar() != null) {
             getActionBar().hide();
-        }
-        else if(getSupportActionBar() != null) {
+        } else if (getSupportActionBar() != null) {
             getSupportActionBar().hide();
         }
 
@@ -141,74 +139,74 @@ public class LoginActivity extends RootActivity implements View.OnClickListener,
         initialization();
         setLoginBtnBg();
     }
-    private void setLoginBtnBg()
-    {
+
+    private void setLoginBtnBg() {
         int state[] = new int[]{android.R.attr.state_pressed};
-        int [] stateDefault = new int[]{android.R.attr.state_enabled};
+        int[] stateDefault = new int[]{android.R.attr.state_enabled};
 
         GradientDrawable gd = new GradientDrawable();
         gd.setShape(GradientDrawable.RECTANGLE);
-        gd.setStroke(2,ContextCompat.getColor(this,R.color.white));
+        gd.setStroke(2, ContextCompat.getColor(this, R.color.white));
         gd.setColor(Color.parseColor(MySurveysPreference.getThemeActionBtnColor(this)));
         gd.setCornerRadius(21.0f);
 
         GradientDrawable defaultGd = new GradientDrawable();
         defaultGd.setShape(GradientDrawable.RECTANGLE);
-        defaultGd.setStroke(2,ContextCompat.getColor(this,R.color.white));
+        defaultGd.setStroke(2, ContextCompat.getColor(this, R.color.white));
         defaultGd.setCornerRadius(21.0f);
 
 
-
-
         StateListDrawable stateListDrawable = new StateListDrawable();
-        stateListDrawable.addState(state,gd);
-        stateListDrawable.addState(stateDefault,defaultGd);
-        if(android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.JELLY_BEAN) {
+        stateListDrawable.addState(state, gd);
+        stateListDrawable.addState(stateDefault, defaultGd);
+        if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.JELLY_BEAN) {
             btnLogin.setBackgroundDrawable(stateListDrawable);
         } else {
             btnLogin.setBackground(stateListDrawable);
         }
     }
-    private void deleteOldSurveyResults()
-    {
-        String outputPath = Environment.getExternalStorageDirectory().getAbsolutePath()+File.separator+ Utils.getApplicationName(mContext)+File.separator +"Completed"+File.separator;
-        File dir = new File (outputPath);
-        if(dir.exists())
-        {
+
+    private void deleteOldSurveyResults() {
+        String outputPath = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + Utils.getApplicationName(mContext) + File.separator + "Completed" + File.separator;
+        File dir = new File(outputPath);
+        if (dir.exists()) {
             deleteRecursive(dir);
         }
     }
-    private void deleteRecursive(File fileOrDirectory)
-    {
-        try
-        {
+
+    private void deleteRecursive(File fileOrDirectory) {
+        try {
             if (fileOrDirectory.isDirectory())
                 for (File child : fileOrDirectory.listFiles())
                     deleteRecursive(child);
 
             fileOrDirectory.delete();
-        }catch (Exception ex)
-        {
-            if(BuildConfig.DEBUG)
-                Log.i(LoginActivity.class.getName(),ex.getMessage());
+        } catch (Exception ex) {
+            if (BuildConfig.DEBUG)
+                Log.i(LoginActivity.class.getName(), ex.getMessage());
         }
     }
 
-    private void setStatusBarColor()
-    {
+    private void setStatusBarColor() {
         final String mediaId = MySurveysPreference.getLoginBgMediaId(mContext);
-        if (mediaId != null)
-        {
+        if (mediaId != null) {
             String filePath = Util.searchFile(mContext, mediaId, Util.THEME_PICS);
-            if (filePath != null)
-            {
+            if (filePath != null) {
                 setBackGroundImage(filePath);
-            }
-            else
-            {
+            } else {
                 asyncTask = new AsyncTask<Void, Void, OPGDownloadMedia>() {
                     @Override
                     protected OPGDownloadMedia doInBackground(Void... voids) {
+                        if (ActivityCompat.checkSelfPermission(mContext, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED || ActivityCompat.checkSelfPermission(mContext, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                            // TODO: Consider calling
+                            //    ActivityCompat#requestPermissions
+                            // here to request the missing permissions, and then overriding
+                            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                            //                                          int[] grantResults)
+                            // to handle the case where the user grants the permission. See the documentation
+                            // for ActivityCompat#requestPermissions for more details.
+                            return null;
+                        }
                         return Util.getOPGSDKInstance().downloadMediaFile(mContext, mediaId, "PNG");
                     }
 
@@ -223,9 +221,7 @@ public class LoginActivity extends RootActivity implements View.OnClickListener,
                 };
                 asyncTask.execute();
             }
-        }
-        else
-        {
+        } else {
             setDrawable(ContextCompat.getDrawable(mContext, R.drawable.splash_nologo), coordinatorLayout);
             ivLogo.setVisibility(View.VISIBLE);
             tvHeaderText.setVisibility(View.GONE);
@@ -233,30 +229,23 @@ public class LoginActivity extends RootActivity implements View.OnClickListener,
 
     }
 
-    private void setBackGroundImage(String filePath)
-    {
+    private void setBackGroundImage(String filePath) {
         Bitmap imageBitmap = BitmapFactory.decodeFile(filePath);
-        if(imageBitmap != null)
-        {
+        if (imageBitmap != null) {
             Drawable drawable = new BitmapDrawable(getResources(), imageBitmap);
-            setDrawable(drawable,coordinatorLayout);
+            setDrawable(drawable, coordinatorLayout);
             setHeader();
-        }
-        else
-        {
-            setDrawable(ContextCompat.getDrawable(mContext,R.drawable.splash_nologo),coordinatorLayout);
+        } else {
+            setDrawable(ContextCompat.getDrawable(mContext, R.drawable.splash_nologo), coordinatorLayout);
         }
     }
 
-    private void setHeader()
-    {
+    private void setHeader() {
         final String headerMediaID = MySurveysPreference.getHeaderMediaId(mContext);
-        if(headerMediaID != null)
-        {
+        if (headerMediaID != null) {
             tvHeaderText.setVisibility(View.GONE);
-            String filePath = Util.searchFile(mContext,headerMediaID, Util.THEME_PICS);
-            if (filePath != null)
-            {
+            String filePath = Util.searchFile(mContext, headerMediaID, Util.THEME_PICS);
+            if (filePath != null) {
                 Bitmap imageBitmap = BitmapFactory.decodeFile(new File(filePath).getAbsolutePath());
                 if (imageBitmap != null && ivLogo != null) {
                     ivLogo.setVisibility(View.VISIBLE);
@@ -266,6 +255,16 @@ public class LoginActivity extends RootActivity implements View.OnClickListener,
                 new AsyncTask<Void, Void, OPGDownloadMedia>() {
                     @Override
                     protected OPGDownloadMedia doInBackground(Void... voids) {
+                        if (ActivityCompat.checkSelfPermission(mContext, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED || ActivityCompat.checkSelfPermission(mContext, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                            // TODO: Consider calling
+                            //    ActivityCompat#requestPermissions
+                            // here to request the missing permissions, and then overriding
+                            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                            //                                          int[] grantResults)
+                            // to handle the case where the user grants the permission. See the documentation
+                            // for ActivityCompat#requestPermissions for more details.
+                            return null;
+                        }
                         return Util.getOPGSDKInstance().downloadMediaFile(mContext, headerMediaID, "PNG");
                     }
 

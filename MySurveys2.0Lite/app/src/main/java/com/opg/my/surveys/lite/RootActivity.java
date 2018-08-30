@@ -114,7 +114,8 @@ public class RootActivity extends AppCompatActivity {
     {
         //plz enter the admin name and shared key of your account on OnePoint website
         //https://account.onepointglobal.com/#/login
-        OPGSDK.initialize("****", "****-****-****-****-****", getApplicationContext());
+        OPGSDK.initialize("Admin-UserName", "Admin-Sharedkey", getApplicationContext());
+
         //pass the required app version
         Util.getOPGSDKInstance().setAppVersion("your-app-version", getApplicationContext());
     }

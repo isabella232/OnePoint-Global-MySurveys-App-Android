@@ -137,4 +137,17 @@
     <string name="ocr_capture_msg" >Presione para capturar.Estirar para acercar / hacer zoom</string>
     <string name="storage_permission_msg">Requiere permisos de almacenamiento para realizar la encuesta. La encuesta necesita acceder a los archivos, fotos, etc.</string>
     <string name="approx_time">Aproximadamente</string>
+
+    <string name="remove">Remove</string>
+    <!-- new strings added -->
+    <string name="upload_count_str" >Surveys to upload</string>
+    <!-- Error messages -->
+    <string name="load_survey_err" >An error occurred while loading the survey</string>
+    <string name="deeplinkurl_err">Failed to load the request</string>
+    <string name="changepwd_unknown_err">An error occurred while changing the password</string>
+    <string name="upd_prf_unknown_err">An error occurred while updating the profile</string>
+    <string name="upd_prf_img_err">An error occurred while updating the profile picture</string>
+    <string name="prf_img_path_err">The image is not found</string>
+    <string name="frgt_pwd_unknown_err">An error occurred while trying to send an email to reset the password</string>
+    <string name="login_unknown_err">Authentication Failed. Please try again</string>
 </resources>

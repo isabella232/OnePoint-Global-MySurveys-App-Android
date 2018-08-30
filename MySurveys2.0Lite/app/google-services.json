@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "12456",
+    "firebase_url": "https://my-surveys-lite-12456.firebaseio.com",
+    "project_id": "my-surveys-lite-12456",
+    "storage_bucket": "my-surveys-lite-12456.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:123456:android:123456",
+        "android_client_info": {
+          "package_name": "com.opg.my.surveys.lite"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "123456-fa51o123456hfa3a2b1fji66m.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.opg.my.surveys.lite",
+            "certificate_hash": "0d7c4907123456e330841ddfddfe8881c1df45gfg0fb"
+          }
+        },
+        {
+          "client_id": "123456-fp8uakrmkq123456truq6caa1opjduug.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "BUBUIzdedmyBqk-WXQspzd-123456_Q4dHdfdf6tOXMoSs"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "123456-fp8uakrmk1234563truq6caa1dfdavljdyyg.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

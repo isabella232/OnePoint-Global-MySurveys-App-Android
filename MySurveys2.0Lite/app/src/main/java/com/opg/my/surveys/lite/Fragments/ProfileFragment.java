@@ -7,6 +7,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -96,12 +97,12 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
     private ProgressBar progressBar;
     private static OPGPanellistProfile panellistProfile;
     private GoogleApiClient mGoogleApiClient;
-    private LinearLayout containerGallery, containerCamera;//, containerRemoveImage;
+    private LinearLayout containerGallery, containerCamera, containerRemove;
     private AsyncTask<String, Void, OPGDownloadMedia> downloadProfilePic;
     private AsyncTask<OPGPanellistProfile, Void, OPGUpdatePanellistProfile> updPanellistProAsyncTask;
     private Dialog progressDialog;
     private Dialog selectImageDialog;
-    private String fileName ;
+    private String fileName;
     private File saveFile;// =  new File(Environment.getExternalStorageDirectory().getAbsolutePath()+File.separator+ Utils.getApplicationName(getActivity())+File.separator+Util.PROFILE_PICS, fileName);
 
     private boolean updatedCountry = false;
@@ -109,11 +110,11 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
     private boolean canUpload = true;
     private boolean isGallery = false;
     public String IMAGE_REGEX = "%%0%dd";
-    public static final String IMAGE_GALLERY_       = "image_gallery_";
+    public static final String IMAGE_GALLERY_ = "image_gallery_";
     public String JPEG = ".jpeg";
     private String tempDir = "temp/";
     private String imagesDir = "/images/";
-    public String CANNOT_CREATE_DIR      = "Cannot create dir ";
+    public String CANNOT_CREATE_DIR = "Cannot create dir ";
     private String _currentMediaPath = "";
     private static int MAX_IMAGE_SIZE = 1 * 1024 * 1024;//size in bytes
     private boolean fetchData = true;
@@ -121,17 +122,15 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
     private BroadcastReceiver mReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if (intent.getAction().equals(Util.BROADCAST_ACTION_SAVE_DATA) || intent.getAction().equals(Util.BROADCAST_ACTION_REFRESH))
-            {
-                if (MySurveysPreference.isDownloaded(getActivity()) )
-                {
+            if (intent.getAction().equals(Util.BROADCAST_ACTION_SAVE_DATA) || intent.getAction().equals(Util.BROADCAST_ACTION_REFRESH)) {
+                if (MySurveysPreference.isDownloaded(getActivity())) {
                     getProfileImageFromLocalDB();
                     getProfileDataFromLocalDB();
                 }
                 if (Util.isServiceRunning(getActivity(), FetchDataService.class)) {
                     ((HomeActivity) getActivity()).showSnackBar(getString(R.string.sync_msg), Snackbar.LENGTH_INDEFINITE);
-                }else {
-                    ((HomeActivity)getActivity()).dismissSnackBar();
+                } else {
+                    ((HomeActivity) getActivity()).dismissSnackBar();
                 }
             }
         }
@@ -148,7 +147,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
      * @return A new instance of fragment ProfileFragment.
      */
     public static ProfileFragment newInstance() {
-        if(profileFragment == null){
+        if (profileFragment == null) {
             profileFragment = new ProfileFragment();
         }
         return profileFragment;
@@ -163,15 +162,15 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         } catch (OPGException e) {
             e.printStackTrace();
         }
-        input_layout_name = (TextInputLayout)view.findViewById(R.id.input_layout_name);
-        imgProfile = (RoundedImageView) view.findViewById(R.id.img_profile);
-        txtName = (EditText) view.findViewById(R.id.et_name);
-        txtEmailID = (EditText) view.findViewById(R.id.et_emailid);
-        etCountryName = (EditText) view.findViewById(R.id.et_country);
-        btnChangeImage = (ImageView) view.findViewById(R.id.btn_change_image);
-        btnEdit = (TextView) view.findViewById(R.id.tv_edit);
-        progressBar = (ProgressBar)view.findViewById(R.id.progress_profile);
-        btnLogout = (TextView) view.findViewById(R.id.btn_logout);
+        input_layout_name = view.findViewById(R.id.input_layout_name);
+        imgProfile = view.findViewById(R.id.img_profile);
+        txtName = view.findViewById(R.id.et_name);
+        txtEmailID = view.findViewById(R.id.et_emailid);
+        etCountryName = view.findViewById(R.id.et_country);
+        btnChangeImage = view.findViewById(R.id.btn_change_image);
+        btnEdit = view.findViewById(R.id.tv_edit);
+        progressBar = view.findViewById(R.id.progress_profile);
+        btnLogout = view.findViewById(R.id.btn_logout);
         btnChangeImage.setOnClickListener(this);
         txtName.setEnabled(false);
         etCountryName.setEnabled(false);
@@ -181,13 +180,12 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
 
         progressBar.setIndeterminate(true);
         progressBar.getIndeterminateDrawable().setColorFilter(Color.parseColor(MySurveysPreference.getThemeActionBtnColor(getActivity())), android.graphics.PorterDuff.Mode.MULTIPLY);//Color.parseColor(ThemeManager.getThemeManagerInstance().getActionBtn())
-        Util.setTypeface(getActivity(),(TextView)view.findViewById(R.id.tv_profile),"font/roboto_regular.ttf");
-        Util.setTypeface(getActivity(),(TextView)view.findViewById(R.id.tv_edit),"font/roboto_regular.ttf");
+        Util.setTypeface(getActivity(),  view.findViewById(R.id.tv_profile), "font/roboto_regular.ttf");
+        Util.setTypeface(getActivity(),  view.findViewById(R.id.tv_edit), "font/roboto_regular.ttf");
 
         Bitmap bitmap = BitmapFactory.decodeResource(getActivity().getResources(), R.drawable.profile_circle);
         //putting default profile image
-        if(bitmap != null)
-        {
+        if (bitmap != null) {
             imgProfile.setImageBitmap(bitmap);
 
         }
@@ -195,12 +193,12 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         //fetching  the panellist profile from local SQLITE db
         getProfileImageFromLocalDB();
         setUploadListener();
-        File mediaDir = new File(Environment.getExternalStorageDirectory().getAbsolutePath()+File.separator+ Utils.getApplicationName(getActivity()));
+        File mediaDir = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + Utils.getApplicationName(getActivity()));
         if (!mediaDir.exists()) {
             mediaDir.mkdir();
         }
-        fileName = System.currentTimeMillis() / 1000L+ ".jpeg";
-        saveFile =  new File(mediaDir, fileName);
+        fileName = System.currentTimeMillis() / 1000L + ".jpeg";
+        saveFile = new File(mediaDir, fileName);
 
         InputFilter filter = new InputFilter() {
             @Override
@@ -220,10 +218,10 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
     }
 
     private void setUploadListener() {
-        ((HomeActivity)getActivity()).setUploadProfilePicListener(new HomeActivity.UploadProfilePicListener() {
+        ((HomeActivity) getActivity()).setUploadProfilePicListener(new HomeActivity.UploadProfilePicListener() {
             @Override
             public void onStartUpload() {
-                if(progressBar!=null)
+                if (progressBar != null)
                     progressBar.setVisibility(View.VISIBLE);
                 canUpload = false;
             }
@@ -231,32 +229,26 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
             @Override
             public void onUploadCompleted(String mediaID, String picturePath, String errorMessage) {
                 canUpload = true;
-                try{
+                try {
                     if (progressBar != null) {
                         progressBar.setVisibility(View.GONE);
                     }
-                    if(mediaID != null)
-                    {
+                    if (mediaID != null) {
                         panellistProfile.setMediaID(mediaID);
-                        Util.moveFile(getActivity(),picturePath,mediaID,Util.PROFILE_PICS);
+                        Util.moveFile(getActivity(), picturePath, mediaID, Util.PROFILE_PICS);
                         File file = new File(picturePath);
-                        if(file.exists())
-                        {
+                        if (file.exists()) {
                             file.delete();
                         }
-                        picturePath = Util.searchFile(getActivity(),mediaID,Util.PROFILE_PICS);
+                        picturePath = Util.searchFile(getActivity(), mediaID, Util.PROFILE_PICS);
                         encryptFile(picturePath);
-                        setProfileImage(picturePath,false);
-                    }
-                    else if(errorMessage.equals(Util.SESSION_TIME_OUT_ERROR))
-                    {
+                        setProfileImage(picturePath, false);
+                    } else if (errorMessage.equals(Util.SESSION_TIME_OUT_ERROR)) {
                         Util.launchLoginActivity(getActivity());
-                    }
-                    else
-                    {
+                    } else {
                         showToast(getString(R.string.unknown_error));
                     }
-                }catch (Exception e){
+                } catch (Exception e) {
 
                 }
             }
@@ -274,7 +266,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
      *  Stops the already running downloadProfileImageAsyncTask
      */
     private void stopDownloadProfilePicAsync() {
-        if(downloadProfilePic!=null && downloadProfilePic.getStatus() != AsyncTask.Status.FINISHED){
+        if (downloadProfilePic != null && downloadProfilePic.getStatus() != AsyncTask.Status.FINISHED) {
             downloadProfilePic.cancel(true);
         }
     }
@@ -282,19 +274,19 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
 
     @Override
     public void onDestroyView() {
-        progressDialog= null;
-        imgProfile= null;
+        progressDialog = null;
+        imgProfile = null;
         txtName = null;
-        txtEmailID  = null;
-        etCountryName  = null;
-        btnChangeImage  = null;
-        btnEdit  = null;
-        progressBar  = null;
+        txtEmailID = null;
+        etCountryName = null;
+        btnChangeImage = null;
+        btnEdit = null;
+        progressBar = null;
         btnLogout = null;
         containerGallery = null;
         containerCamera = null;
-        //containerRemoveImage = null;
-        selectImageDialog= null;
+        containerRemove = null;
+        selectImageDialog = null;
         downloadProfilePic = null;
         updPanellistProAsyncTask = null;
         input_layout_name = null;
@@ -304,27 +296,27 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onResume() {
         super.onResume();
-        IntentFilter iff= new IntentFilter(Util.BROADCAST_ACTION_SAVE_DATA);
+        IntentFilter iff = new IntentFilter(Util.BROADCAST_ACTION_SAVE_DATA);
         iff.addAction(Util.BROADCAST_ACTION_REFRESH);
         LocalBroadcastManager.getInstance(getActivity()).registerReceiver(mReceiver, iff);
-        if(!updatedCountry) {
+        if (!updatedCountry) {
             //not getting the profile frm db when we change the country
             getProfileDataFromLocalDB();
         }
         updatedCountry = false;
-        if(isUploading() && progressBar != null){
+        if (isUploading() && progressBar != null) {
             progressBar.setVisibility(View.VISIBLE);
             canUpload = false;
-        }else {
+        } else {
             canUpload = true;
         }
     }
 
-    private boolean isUploading()
-    {
-        return ((HomeActivity)getActivity()).getUpdProfileImage()!=null &&
-                ((HomeActivity)getActivity()).getUpdProfileImage().getStatus() == AsyncTask.Status.RUNNING ;
+    private boolean isUploading() {
+        return ((HomeActivity) getActivity()).getUpdProfileImage() != null &&
+                ((HomeActivity) getActivity()).getUpdProfileImage().getStatus() == AsyncTask.Status.RUNNING;
     }
+
     @Override
     public void onPause() {
         super.onPause();
@@ -332,22 +324,21 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
     }
 
 
-
-    private void getProfileDataFromLocalDB()
-    {
-        if(MySurveysPreference.isDownloaded(getActivity())) {
-            try
-            {
+    private void getProfileDataFromLocalDB() {
+        if (MySurveysPreference.isDownloaded(getActivity())) {
+            try {
                 Thread profileDataThread = new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        if(fetchData) {
+                        if (fetchData) {
                             try {
                                 panellistProfile = RetriveOPGObjects.getPanellistProfile();
                                 getActivity().runOnUiThread(new Runnable() {
                                     @Override
                                     public void run() {
-                                        updateProfileViews();
+                                        if(panellistProfile != null) {
+                                            updateProfileViews();
+                                        }
                                     }
                                 });
                             } catch (Exception e) {
@@ -359,16 +350,14 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
                 profileDataThread.setPriority(Thread.MIN_PRIORITY);
                 profileDataThread.start();
 
-            }
-            catch (Exception ex)
-            {
-                Log.i(Util.TAG,ex.getMessage());
+            } catch (Exception ex) {
+                Log.i(Util.TAG, ex.getMessage());
             }
         }
     }
 
     private void updateProfileViews() {
-        if (panellistProfile != null && txtName!=null) {
+        if (panellistProfile != null && txtName != null) {
             txtName.setText(panellistProfile.getFirstName());
             txtEmailID.setText(panellistProfile.getEmailID());
             etCountryName.setText(panellistProfile.getCountryName());
@@ -377,12 +366,11 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         }
     }
 
-    private void getProfileImageFromLocalDB()
-    {
+    private void getProfileImageFromLocalDB() {
         Thread profileDataThread = new Thread(new Runnable() {
             @Override
             public void run() {
-                if(fetchData) {
+                if (fetchData) {
                     try {
                         panellistProfile = RetriveOPGObjects.getPanellistProfile();
                         getActivity().runOnUiThread(new Runnable() {
@@ -401,40 +389,33 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         profileDataThread.start();
     }
 
-    private void updateProfileImage(){
+    private void updateProfileImage() {
         try {
-            if (panellistProfile != null) {
-                if (panellistProfile.getMediaID()!= null && !panellistProfile.getMediaID().isEmpty()) {
-                    String profilePicPath = Util.searchFile(getActivity(),panellistProfile.getMediaID(), Util.PROFILE_PICS);
-                    if (profilePicPath != null)
-                    {
-                        setProfileImage(profilePicPath,true);
-                    }
-                    else
-                    {
-                        downloadMedia(panellistProfile.getMediaID());
-                    }
+            if (panellistProfile.getMediaID() != null && !panellistProfile.getMediaID().isEmpty() && !panellistProfile.getMediaID().equals("0")) {
+                String profilePicPath = Util.searchFile(getActivity(), panellistProfile.getMediaID(), Util.PROFILE_PICS);
+                if (profilePicPath != null) {
+                    setProfileImage(profilePicPath, true);
+                } else {
+                    downloadMedia(panellistProfile.getMediaID());
                 }
             }
         } catch (Exception ex) {
-            if(BuildConfig.DEBUG) {
+            if (BuildConfig.DEBUG) {
                 Log.i(Util.TAG, ex.toString());
             }
         }
     }
 
-    private void setProfileImage(final String profilePicPath, final boolean retry)
-    {
+    private void setProfileImage(final String profilePicPath, final boolean retry) {
         if (progressBar != null) {
             progressBar.setVisibility(View.VISIBLE);
         }
-        if(imgProfile != null)
-        {
+        if (imgProfile != null) {
             imgProfile.postDelayed(new Runnable() {
                 @Override
                 public void run() {
                     try {
-                        if(imgProfile!=null && profilePicPath!=null) {
+                        if (imgProfile != null && profilePicPath != null) {
                             /*String desFilePath = decryptFile(profilePicPath);*/
                             // First decode with inJustDecodeBounds=true to check dimensions
                             final BitmapFactory.Options options = new BitmapFactory.Options();
@@ -447,7 +428,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
                             deleteFile(desFilePath);*/
                             //Decrypting the bytearray of the image from the encrypted
                             byte[] decryptArray = Aes256.decryptFileData(profilePicPath);
-                            final Bitmap bitmap = BitmapFactory.decodeByteArray(decryptArray, 0, decryptArray.length,options);
+                            final Bitmap bitmap = BitmapFactory.decodeByteArray(decryptArray, 0, decryptArray.length, options);
                             getActivity().runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
@@ -473,12 +454,11 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
                                 }
                             });
                         }
-                    }catch (Exception ex)
-                    {
+                    } catch (Exception ex) {
                         ex.printStackTrace();
                     }
                 }
-            },500);
+            }, 500);
         }
     }
 
@@ -489,22 +469,18 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
 
     @Override
     public void onClick(View view) {
-        if(Util.isOnline(getActivity()))
-        {
+        if (Util.isOnline(getActivity())) {
             switch (view.getId()) {
                 case R.id.tv_edit:
                     onEditOrSaveClick();
                     break;
 
                 case R.id.btn_change_image:
-                    if(MySurveysPreference.isDownloaded(getActivity()) )
-                    {
-                        if(canUpload)
-                        {
+                    if (MySurveysPreference.isDownloaded(getActivity())) {
+                        if (canUpload) {
                             selectImage();
                         }
-                    }
-                    else if(MySurveysPreference.isDownloaded(getActivity())){
+                    } else if (MySurveysPreference.isDownloaded(getActivity())) {
                         Util.showSyncDialog(getActivity());
                     }
                     break;
@@ -513,25 +489,20 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
                     logout();
                     break;
 
-                case R.id.et_country :
+                case R.id.et_country:
                     startCountryActivity();
                     break;
             }
-        }
-        else
-        {
+        } else {
             showToast(getString(R.string.err_no_internet));
         }
     }
 
-    private void onEditOrSaveClick()
-    {
-        if(MySurveysPreference.isDownloaded(getActivity()))
-        {
-            if(txtName.isEnabled())
-            {
-                Util.validateEditext(txtName,input_layout_name,getString(R.string.err_name_msg));
-                if(!txtName.getText().toString().trim().isEmpty()){
+    private void onEditOrSaveClick() {
+        if (MySurveysPreference.isDownloaded(getActivity())) {
+            if (txtName.isEnabled()) {
+                Util.validateEditext(txtName, input_layout_name, getString(R.string.err_name_msg));
+                if (!txtName.getText().toString().trim().isEmpty()) {
                     txtName.setEnabled(false);
                     etCountryName.setEnabled(false);
                     btnEdit.setText(R.string.title_edit_profile);
@@ -542,9 +513,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
                     panellistProfile.setPostalCode(etCountryName.getText().toString());
                     updatePanellistProfile(panellistProfile);
                 }
-            }
-            else
-            {
+            } else {
                 txtName.setEnabled(true);
                 etCountryName.setEnabled(true);
                 btnEdit.setText(R.string.title_save_profile);
@@ -552,40 +521,35 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
                 etCountryName.setBackgroundResource(R.drawable.singleline_et_bg_gray);
 
             }
-        }
-        else
-        {
+        } else {
             Util.showSyncDialog(getActivity());
         }
     }
-    private void startCountryActivity()
-    {
+
+    private void startCountryActivity() {
         //for hiding Keyboard onClick of editText
-        final InputMethodManager imm = (InputMethodManager)getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-        if(etCountryName != null)
-        {
+        final InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+        if (etCountryName != null) {
             etCountryName.requestFocus();
             imm.hideSoftInputFromWindow(etCountryName.getWindowToken(), 0);
         }
         Intent intent = new Intent(getActivity(), CountryActivity.class);
-        intent.putExtra("panellistProfile",panellistProfile);
-        if(intent.resolveActivity(getActivity().getPackageManager()) != null)
-        {
-            startActivityForResult(intent,Util.COUNTRY_RESULT_CODE);
+        intent.putExtra("panellistProfile", panellistProfile);
+        if (intent.resolveActivity(getActivity().getPackageManager()) != null) {
+            startActivityForResult(intent, Util.COUNTRY_RESULT_CODE);
         }
         updatedCountry = true;
     }
-    private void showToast(String msg)
-    {
-        if(getActivity()!=null)
-            makeText(getActivity(),msg,Toast.LENGTH_SHORT).show();
+
+    private void showToast(String msg) {
+        if (getActivity() != null)
+            makeText(getActivity(), msg, Toast.LENGTH_SHORT).show();
     }
 
-    private void downloadMedia(final String mediaId)
-    {
-        if(Util.isOnline(getActivity())){
+    private void downloadMedia(final String mediaId) {
+        if (Util.isOnline(getActivity())) {
             downloadProfilePic = new DownloadProfilePic().execute(mediaId);
-        }else{
+        } else {
             showToast(getString(R.string.err_no_internet));
         }
     }
@@ -602,8 +566,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         mGoogleApiClient.connect();
     }
 
-    private void logout()
-    {
+    private void logout() {
         showLogoutDialog();
     }
 
@@ -612,12 +575,12 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.setContentView(R.layout.dialog_logout);
         Button btnConfirm = (Button) dialog.findViewById(R.id.btn_confirm_logout);
-        Button btnCancel = (Button)dialog.findViewById(R.id.btn_cancel_logout);
+        Button btnCancel = (Button) dialog.findViewById(R.id.btn_cancel_logout);
         btnConfirm.setTextColor(Color.parseColor(MySurveysPreference.getThemeActionBtnColor(getActivity())));
         btnCancel.setTextColor(Color.parseColor(MySurveysPreference.getThemeActionBtnColor(getActivity())));
         TextView tvTitleLogoutDialog = (TextView) dialog.findViewById(R.id.tv_title_logout_dialog);
         tvTitleLogoutDialog.setText(getString(R.string.logout_message));
-        final ProgressBar progressBar1 = (ProgressBar)dialog.findViewById(R.id.pb_upload_results);
+        final ProgressBar progressBar1 = (ProgressBar) dialog.findViewById(R.id.pb_upload_results);
         btnConfirm.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -635,42 +598,41 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
     }
 
 
-
     private void logout(final Dialog dialog) {
         stopDownloadProfilePicAsync();
-        ((HomeActivity)getActivity()).logout(mGoogleApiClient, new HomeActivity.LogoutListener() {
+        ((HomeActivity) getActivity()).logout(mGoogleApiClient, new HomeActivity.LogoutListener() {
             @Override
             public void onStart() {
-                if(dialog!=null && dialog.isShowing()){
+                if (dialog != null && dialog.isShowing()) {
                     dialog.dismiss();
                 }
-                if(progressDialog != null) {
+                if (progressDialog != null) {
                     progressDialog.show();
                 }
             }
 
             @Override
             public void onCompleted() {
-                if(progressDialog != null && progressDialog.isShowing()) {
+                if (progressDialog != null && progressDialog.isShowing()) {
                     progressDialog.dismiss();
                 }
                 Intent intent = new Intent(getActivity(), LoginActivity.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP );  //Clearing the task history
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);  //Clearing the task history
                 getActivity().finish();
                 startActivity(intent); //Launching LoginActivity
             }
         });
     }
-    private void selectImage()
-    {
+
+    private void selectImage() {
         selectImageDialog = null;
         selectImageDialog = new Dialog(getActivity());
         selectImageDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-        selectImageDialog.setContentView(R.layout.dialog_select_iamge);
+        selectImageDialog.setContentView(R.layout.dialog_select_image);
         Button btnCancel = (Button) selectImageDialog.findViewById(R.id.btn_cancel_select_image);
         containerGallery = (LinearLayout) selectImageDialog.findViewById(R.id.container_gallery);
         containerCamera = (LinearLayout) selectImageDialog.findViewById(R.id.container_camera);
-        // containerRemoveImage = (LinearLayout) selectImageDialog.findViewById(R.id.container_remove_image);
+        containerRemove = selectImageDialog.findViewById(R.id.container_remove);
         TextView tvTitle = (TextView) selectImageDialog.findViewById(R.id.tv_select_image_title);
         tvTitle.setTextColor(Color.parseColor(MySurveysPreference.getThemeActionBtnColor(getActivity())));
 
@@ -686,6 +648,15 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
                 captureImageFromCamera();
             }
         });
+        containerRemove.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(panellistProfile!=null && !panellistProfile.getMediaID().equals("0"))
+                    removeProfileImage();
+                selectImageDialog.dismiss();
+            }
+        });
+
         btnCancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -697,104 +668,85 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         selectImageDialog.show();
     }
 
-    private void captureImageFromCamera()
-    {
-        if(Util.checkPermission(getActivity(), Manifest.permission.CAMERA) && Util.checkPermission(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE))
-        {
+    private void captureImageFromCamera() {
+        if (Util.checkPermission(getActivity(), Manifest.permission.CAMERA) && Util.checkPermission(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
             isGallery = false;
             Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
-            {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                 intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                Uri contentUri = FileProvider.getUriForFile(getContext(),getActivity().getPackageName(), saveFile);
+                Uri contentUri = FileProvider.getUriForFile(getContext(), getActivity().getPackageName(), saveFile);
                 intent.putExtra(MediaStore.EXTRA_OUTPUT, contentUri);
-            }
-            else
-            {
+            } else {
                 intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(saveFile));
             }
-            if( intent.resolveActivity(getActivity().getPackageManager()) != null )
-            {
+            if (intent.resolveActivity(getActivity().getPackageManager()) != null) {
                 startActivityForResult(intent, CAPTURE_IMAGE_REQUEST_CODE);
-            }
-            else
-            {
-                makeText(getActivity(),"No App found to launch camera", LENGTH_SHORT).show();
+            } else {
+                makeText(getActivity(), "No App found to launch camera", LENGTH_SHORT).show();
             }
             selectImageDialog.dismiss();
-        }
-        else {
+        } else {
             ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_CODE_PROFILE);
         }
     }
 
     private void selectImageFromGallery() {
-        if(Util.checkPermission(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE) && Util.checkPermission(getActivity(), Manifest.permission.READ_EXTERNAL_STORAGE) )
-        {
+        if (Util.checkPermission(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE) && Util.checkPermission(getActivity(), Manifest.permission.READ_EXTERNAL_STORAGE)) {
             isGallery = true;
-            Intent galleryIntent = new Intent(Intent.ACTION_PICK,android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI); // -  we are not using "Intent.ACTION_PICK" becoz it needs Photos App of google
-            galleryIntent.putExtra(Intent.EXTRA_LOCAL_ONLY,true);
+            Intent galleryIntent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI); // -  we are not using "Intent.ACTION_PICK" becoz it needs Photos App of google
+            galleryIntent.putExtra(Intent.EXTRA_LOCAL_ONLY, true);
             ComponentName componentName = galleryIntent.resolveActivity(getActivity().getPackageManager());
-            if( componentName != null )
-            {
+            if (componentName != null) {
                 startActivityForResult(galleryIntent, PICK_IMAGE_REQUEST_CODE);
-            }
-            else
-            {
+            } else {
                 Intent newIntent = new Intent(Intent.ACTION_GET_CONTENT);
                 newIntent.setType("image/*");
                 componentName = newIntent.resolveActivity(getActivity().getPackageManager());
-                if(componentName != null )
-                {
+                if (componentName != null) {
                     startActivityForResult(newIntent, PICK_IMAGE_REQUEST_CODE);
-                }
-                else
-                {
-                    makeText(getActivity(),"No App found to open image", LENGTH_SHORT).show();
+                } else {
+                    makeText(getActivity(), "No App found to open image", LENGTH_SHORT).show();
 
                 }
             }
             selectImageDialog.dismiss();
-        }
-        else
-        {
+        } else {
             ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE}, REQUEST_CODE_PROFILE);
         }
 
     }
 
+    private void removeProfileImage() {
+        if (panellistProfile != null && Util.isOnline(getActivity())) {
+            panellistProfile.setMediaID("0");
+            updatePanellistProfile(panellistProfile);
+        }
+    }
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode == PICK_IMAGE_REQUEST_CODE && resultCode == RESULT_OK && data != null && data.getData() != null) {
+        if (requestCode == PICK_IMAGE_REQUEST_CODE && resultCode == RESULT_OK && data != null && data.getData() != null) {
             Uri uri = data.getData();
             String path = FileUtils.getPath(getActivity(), uri);
-            if(path != null && !path.isEmpty())
-            {
-                _currentMediaPath= path;
+            if (path != null && !path.isEmpty()) {
+                _currentMediaPath = path;
                 new CompressImage(path).execute();
-            }
-            else
-            {
+            } else {
                 try {
                     final InputStream ist = getActivity().getContentResolver().openInputStream(data.getData());
-                    copyToFile(ist,saveFile);
-                    _currentMediaPath= saveFile.getAbsolutePath();
+                    copyToFile(ist, saveFile);
+                    _currentMediaPath = saveFile.getAbsolutePath();
                     new CompressImage(saveFile.getAbsolutePath()).execute();
-                }catch (Exception ex)
-                {
+                } catch (Exception ex) {
 
                 }
             }
-        }
-        else if(requestCode == CAPTURE_IMAGE_REQUEST_CODE && resultCode == RESULT_OK) {
-            _currentMediaPath= saveFile.getAbsolutePath();
+        } else if (requestCode == CAPTURE_IMAGE_REQUEST_CODE && resultCode == RESULT_OK) {
+            _currentMediaPath = saveFile.getAbsolutePath();
             new CompressImage(saveFile.getAbsolutePath()).execute();
-        }
-        else if(requestCode == Util.COUNTRY_RESULT_CODE && resultCode == RESULT_OK && data != null )/*&& data.getExtras() != null*/
-        {
-            if(data.getParcelableExtra("panellistProfile") != null)
-            {
+        } else if (requestCode == Util.COUNTRY_RESULT_CODE && resultCode == RESULT_OK && data != null)/*&& data.getExtras() != null*/ {
+            if (data.getParcelableExtra("panellistProfile") != null) {
                 updatedCountry = true;
                 OPGPanellistProfile newPanellistProfile = data.getParcelableExtra("panellistProfile");
                 panellistProfile.setCountryName(newPanellistProfile.getCountryName());
@@ -803,6 +755,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
             }
         }
     }
+
     private static boolean copyToFile(InputStream inputStream, File destFile) {
         if (inputStream == null || destFile == null) return false;
         try {
@@ -822,32 +775,24 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         }
     }
 
-    private void uploadProfileImage(final String profilePicturePath)
-    {
-        if(Util.isOnline(getActivity()))
-        {
-            if(profilePicturePath!=null && !profilePicturePath.isEmpty()){
-                ((HomeActivity)getActivity()).startUploadPic(profilePicturePath);
-            }else {
-                Util.showMessageDialog(getActivity(),getResources().getString(R.string.unknown_error),"");
+    private void uploadProfileImage(final String profilePicturePath) {
+        if (Util.isOnline(getActivity())) {
+            if (profilePicturePath != null && !profilePicturePath.isEmpty()) {
+                ((HomeActivity) getActivity()).startUploadPic(profilePicturePath);
+            } else {
+                Util.showMessageDialog(getActivity(), getResources().getString(R.string.unknown_error), "");
             }
-        }
-        else
-        {
+        } else {
             showToast(getString(R.string.err_no_internet));
             makeText(getActivity(), "", LENGTH_SHORT).show();
         }
     }
 
-    private void updatePanellistProfile(final OPGPanellistProfile panellistProfile)
-    {
+    private void updatePanellistProfile(final OPGPanellistProfile panellistProfile) {
 
-        if(Util.isOnline(getActivity()))
-        {
+        if (Util.isOnline(getActivity())) {
             updPanellistProAsyncTask = new UpdatePanellistProfile(panellistProfile).execute(panellistProfile);
-        }
-        else
-        {
+        } else {
             showToast(getString(R.string.err_no_internet));
         }
     }
@@ -856,13 +801,23 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            if(progressBar != null)
+            if (progressBar != null)
                 progressBar.setVisibility(View.VISIBLE);
         }
 
         @Override
         protected OPGDownloadMedia doInBackground(String... strings) {
-            return Util.getOPGSDKInstance().downloadMediaFile(getActivity(),strings[0], "JPEG");
+            if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED || ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                // TODO: Consider calling
+                //    ActivityCompat#requestPermissions
+                // here to request the missing permissions, and then overriding
+                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                //                                          int[] grantResults)
+                // to handle the case where the user grants the permission. See the documentation
+                // for ActivityCompat#requestPermissions for more details.
+                return null;
+            }
+            return Util.getOPGSDKInstance().downloadMediaFile(getActivity(), strings[0], "JPEG");
         }
 
         @Override
@@ -936,6 +891,9 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
                 if(opgUpdatePanellistProfile.isSuccess())
                 {
                     SaveOPGObjects.storePanellistProfile(panellistProfile);
+                    if(panellistProfile.getMediaID().equals("0")) {
+                        setDefaultProfileImage();
+                    }
                 }
                 else if(opgUpdatePanellistProfile.getStatusMessage().contains(Util.SESSION_TIME_OUT_ERROR))
                 {
@@ -960,6 +918,14 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
             }
         }
     }
+
+
+    private void setDefaultProfileImage() {
+        if(imgProfile!=null){
+            imgProfile.setImageResource(R.drawable.profile_circle);
+        }
+    }
+
     private void setOriginalValue(OPGPanellistProfile panellistProfile)
     {
         txtName.setText(panellistProfile.getFirstName());

@@ -36,7 +36,7 @@
                 android:orientation="vertical">
 
                 <ImageView
-                   style="@style/gallery_btn_style"/>
+                    style="@style/gallery_btn_style"/>
 
                 <TextView
                     style="@style/tv_gallery_style"/>
@@ -55,6 +55,21 @@
 
                 <TextView
                     style="@style/tv_camera_style"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/container_remove"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <ImageView
+                    style="@style/remove_btn_style"/>
+
+                <TextView
+                    style="@style/tv_remove_style"/>
             </LinearLayout>
 
             <!--<LinearLayout
