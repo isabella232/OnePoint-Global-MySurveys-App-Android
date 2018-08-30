@@ -22,6 +22,15 @@ This procedure assumes you have already created a repository on GitHub, or have 
 
 3) Clone URL buttonIn the Clone with HTTPs section, click  to copy the clone URL for the repository.
 4) Extract the ZIP file and import the project in Android Studio.
+
+## Intialization
+1)Place your admin username , admin sharedkey and the appversion in the sdkInitialize() method of the RootActivity class.
+
+2)Also generate a AES-256 Encryption and place it in the app/build.gradle file under the AES_KEY as shown below.
+  <u>buildConfigField "String", "AES_KEY", '"Enter the key for the AES-256 Encryption"'</u>
+  The above encryption key is used for encrypting the senstive data in the sharedpreferences and db.
+
+
 ## User Interfaces
 ### LogIn Page
 This is the login screen of MySurveys app. Once you got the username and password ,you can login to app and can take the surveys assigned to you.
