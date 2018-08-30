@@ -105,18 +105,17 @@ public class HomeActivity extends AppCompatActivity implements OPGGeofenceTrigge
     // private CoordinatorLayout mainLayout;
     // Keys
     private TabLayout tabLayout;
-    private  Toolbar toolbar;
+    private Toolbar toolbar;
     private Context mContext;
     private Menu mMenu;
     private MenuItem refreshMenuItem;
     private Snackbar snackbar;
     private Animation rotation = null;
     private OPGSDK opgsdk;
-    public AsyncTask<String,Void,String> updProfileImage;
-    private TextView notify_tv,tv_header_logo;
+    public AsyncTask<String, Void, String> updProfileImage;
+    private TextView notify_tv, tv_header_logo;
     private CountDownTimer countDownTimer;
     private ImageView ivHeaderLogo;
-
 
 
     private SurveysFragment surveysFragment;
@@ -125,92 +124,70 @@ public class HomeActivity extends AppCompatActivity implements OPGGeofenceTrigge
     private ProfileFragment profileFragment;
 
 
-    private int[] tab_icons = {R.drawable.icon_survey,R.drawable.icon_notification,R.drawable.icon_settings,R.drawable.icon_profile};
+    private int[] tab_icons = {R.drawable.icon_survey, R.drawable.icon_notification, R.drawable.icon_settings, R.drawable.icon_profile};
 
 
     private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
 
-            if (intent.getAction().equals(Util.BROADCAST_ACTION_SAVE_DATA))
-            {
+            if (intent.getAction().equals(Util.BROADCAST_ACTION_SAVE_DATA)) {
 
-                if (MySurveysPreference.isDownloaded(mContext))
-                {
+                if (MySurveysPreference.isDownloaded(mContext)) {
                     ThemeManager.getThemeManagerInstance().init(mContext);
                     updateTheme();
                     fetchGeofences();
-                }
-                else
-                {
+                } else {
                     String message = "Failed to store the data ";
-                    if (intent.hasExtra("message"))
-                    {
+                    if (intent.hasExtra("message")) {
                         String msg = intent.getStringExtra("message");
-                        if(msg.equals(Util.SESSION_TIME_OUT_ERROR))
-                        {
+                        if (msg.equals(Util.SESSION_TIME_OUT_ERROR)) {
                             Util.launchLoginActivity(HomeActivity.this);
-                        }
-                        else
-                        {
+                        } else {
                             message = message + "\n" + msg + "\n" + "refresh or try login again";
                         }
-                        showSnackBar(message,Snackbar.LENGTH_LONG);
-                    }
-                    else
-                    {
+                        showSnackBar(message, Snackbar.LENGTH_LONG);
+                    } else {
 
-                        if(!Util.isOnline(mContext))
-                        {
-                            showSnackBar(getString(R.string.no_network_msg),Toast.LENGTH_LONG);
-                        }
-                        else
-                        {
-                            showSnackBar("Some error happen,refresh or try login again",Toast.LENGTH_LONG);
+                        if (!Util.isOnline(mContext)) {
+                            showSnackBar(getString(R.string.no_network_msg), Toast.LENGTH_LONG);
+                        } else {
+                            showSnackBar("Some error happen,refresh or try login again", Toast.LENGTH_LONG);
                         }
                     }
                 }
                 refreshAnimationStop();
-            }
-            else if (intent.getAction().equalsIgnoreCase(Util.BROADCAST_ACTION_GEOFENCE_STOP)
+            } else if (intent.getAction().equalsIgnoreCase(Util.BROADCAST_ACTION_GEOFENCE_STOP)
                     || intent.getAction().equalsIgnoreCase(Util.BROADCAST_ACTION_GEOFENCE_START)) {
                 try {
                     if (intent.getAction().equalsIgnoreCase(Util.BROADCAST_ACTION_GEOFENCE_START)) {
                         fetchGeofences();
                     } else if (intent.getAction().equalsIgnoreCase(Util.BROADCAST_ACTION_GEOFENCE_STOP)) {
-                        if(Util.isServiceRunning(mContext,LocationService.class))
-                        { stopService(new Intent(mContext,LocationService.class)); }
+                        if (Util.isServiceRunning(mContext, LocationService.class)) {
+                            stopService(new Intent(mContext, LocationService.class));
+                        }
                         opgsdk.stopGeofencingMonitor(mContext, mGoogleApiClient, HomeActivity.this);
-                        MySurveysPreference.setLastLocationKnown(mContext,"");
+                        MySurveysPreference.setLastLocationKnown(mContext, "");
                     }
                 } catch (OPGException e) {
-                    MySurveysPreference.setIsGeofencingEnabled(mContext,false);
+                    MySurveysPreference.setIsGeofencingEnabled(mContext, false);
                     e.printStackTrace();
                 }
-            }
-            else if(intent.getAction().equals(Util.ACTION_UPLOAD_RESULT))
-            {
+            } else if (intent.getAction().equals(Util.ACTION_UPLOAD_RESULT)) {
                 String msg = intent.getStringExtra("message");
-                showSnackBar(msg,Snackbar.LENGTH_INDEFINITE);
-            }
-            else if(intent.getAction().equals(Util.BROADCAST_ACTION_UPLOADED_ALL))
-            {
-                if(intent.hasExtra("message")){
+                showSnackBar(msg, Snackbar.LENGTH_INDEFINITE);
+            } else if (intent.getAction().equals(Util.BROADCAST_ACTION_UPLOADED_ALL)) {
+                if (intent.hasExtra("message")) {
                     refreshAnimationStop();
-                    Util.showMessageDialog(mContext,intent.getStringExtra("message"),"");
-                }else{
+                    Util.showMessageDialog(mContext, intent.getStringExtra("message"), "");
+                } else {
                     refreshData();
                 }
-            }
-            else if(intent.getAction().equals(ConnectivityManager.CONNECTIVITY_ACTION) && Util.isOnline(context))
-            {
-                if(!MySurveysPreference.isDownloaded(context))
-                {
+            } else if (intent.getAction().equals(ConnectivityManager.CONNECTIVITY_ACTION) && Util.isOnline(context)) {
+                if (!MySurveysPreference.isDownloaded(context)) {
                     onRefresh();
                 }
-            }
-            else if(intent.getAction().equals(Util.ACTION_SESSION_EXPIRED))
-            {
+            } else if (intent.getAction().equals(Util.ACTION_SESSION_EXPIRED)) {
                 Util.launchLoginActivity((Activity) mContext);
             }
         }
@@ -226,24 +203,24 @@ public class HomeActivity extends AppCompatActivity implements OPGGeofenceTrigge
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
         mContext = this;
-        if(!Util.isTablet(mContext)){
+        if (!Util.isTablet(mContext)) {
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         }
         opgsdk = new OPGSDK();
 
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
-        notify_tv  = (TextView)findViewById(R.id.notify_msg_tv);
-        ivHeaderLogo = (ImageView)findViewById(R.id.iv_header_logo);
-        tv_header_logo = (TextView)findViewById(R.id.tv_header_logo);
-        rotation   = AnimationUtils.loadAnimation(HomeActivity.this, R.anim.clockwise_refresh);
+        notify_tv = (TextView) findViewById(R.id.notify_msg_tv);
+        ivHeaderLogo = (ImageView) findViewById(R.id.iv_header_logo);
+        tv_header_logo = (TextView) findViewById(R.id.tv_header_logo);
+        rotation = AnimationUtils.loadAnimation(HomeActivity.this, R.anim.clockwise_refresh);
         rotation.setRepeatCount(Animation.INFINITE);
-        Util.setTypeface(this,tv_header_logo,"font/roboto_bold.ttf");
+        Util.setTypeface(this, tv_header_logo, "font/roboto_bold.ttf");
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
 
         //To hide the default title from ToolBar
-        if(getSupportActionBar()!=null)
+        if (getSupportActionBar() != null)
             getSupportActionBar().setDisplayShowTitleEnabled(false);
 
 
@@ -262,8 +239,8 @@ public class HomeActivity extends AppCompatActivity implements OPGGeofenceTrigge
 
             @Override
             public void onTabReselected(TabLayout.Tab tab) {
-                if(tab.getPosition()==2 || tab.getPosition()==1 ){
-                    Util.sendBroadcastMessage(true,mContext,"",Util.BROADCAST_ACTION_REFRESH_FRAGMENT);
+                if (tab.getPosition() == 2 || tab.getPosition() == 1) {
+                    Util.sendBroadcastMessage(true, mContext, "", Util.BROADCAST_ACTION_REFRESH_FRAGMENT);
                 }
             }
         });
@@ -275,8 +252,7 @@ public class HomeActivity extends AppCompatActivity implements OPGGeofenceTrigge
      * Fetch the data from api and store in db
      */
     private void performAPIOperations() {
-        if (MySurveysPreference.isDBCreated(mContext) && !MySurveysPreference.isDownloaded(mContext))
-        {
+        if (MySurveysPreference.isDBCreated(mContext) && !MySurveysPreference.isDownloaded(mContext)) {
             if (Util.isOnline(mContext)) {
                 refreshAnimationStart();
                 startService(new Intent(mContext, FetchDataService.class));
@@ -285,33 +261,33 @@ public class HomeActivity extends AppCompatActivity implements OPGGeofenceTrigge
             } else {
                 showSnackBar(getString(R.string.no_network_msg), Snackbar.LENGTH_LONG);
             }
-        }else {
+        } else {
             Util.sendBroadcastMessage(true, mContext, "", Util.BROADCAST_ACTION_REFRESH);
         }
 
     }
 
     private void setTabs() {
-        if(surveysFragment == null){
+        if (surveysFragment == null) {
             surveysFragment = new SurveysFragment();
         }
-        if(rootFragment == null){
-            rootFragment    = new RootFragment();
+        if (rootFragment == null) {
+            rootFragment = new RootFragment();
         }
-        if(settingsRootFragment == null){
+        if (settingsRootFragment == null) {
             settingsRootFragment = new SettingsRootFragment();
         }
-        if(profileFragment == null){
+        if (profileFragment == null) {
             profileFragment = new ProfileFragment();
         }
-        tabLayout.addTab(tabLayout.newTab().setText("Surveys").setCustomView(getTabView(0,mContext)),true);
-        tabLayout.addTab(tabLayout.newTab().setText("Notifications").setCustomView(getTabView(1,mContext)));
-        tabLayout.addTab(tabLayout.newTab().setText("Settings").setCustomView(getTabView(2,mContext)));
-        tabLayout.addTab(tabLayout.newTab().setText("Profile").setCustomView(getTabView(3,mContext)));
+        tabLayout.addTab(tabLayout.newTab().setText("Surveys").setCustomView(getTabView(0, mContext)), true);
+        tabLayout.addTab(tabLayout.newTab().setText("Notifications").setCustomView(getTabView(1, mContext)));
+        tabLayout.addTab(tabLayout.newTab().setText("Settings").setCustomView(getTabView(2, mContext)));
+        tabLayout.addTab(tabLayout.newTab().setText("Profile").setCustomView(getTabView(3, mContext)));
         replaceFragment(surveysFragment);
     }
 
-    public View getTabView(int position,Context mContext) {
+    public View getTabView(int position, Context mContext) {
         // Given you have a custom layout in `res/layout/custom_tab.xml` with a TextView and ImageView
         View v = LayoutInflater.from(mContext).inflate(R.layout.custom_tab, null);
         ImageView img = (ImageView) v.findViewById(R.id.tab_icon);
@@ -319,35 +295,34 @@ public class HomeActivity extends AppCompatActivity implements OPGGeofenceTrigge
         return v;
     }
 
-    private void setCurrentTabFragment(int tabPosition)
-    {
-        switch (tabPosition)
-        {
-            case 0 :
+    private void setCurrentTabFragment(int tabPosition) {
+        switch (tabPosition) {
+            case 0:
                 replaceFragment(surveysFragment);
                 break;
-            case 1 :
+            case 1:
                 replaceFragment(rootFragment);
                 break;
-            case 2 :
+            case 2:
                 replaceFragment(settingsRootFragment);
                 break;
-            case 3 :
+            case 3:
                 replaceFragment(profileFragment);
                 break;
         }
     }
+
     public void replaceFragment(Fragment fragment) {
-        try{
+        try {
             FragmentManager fm = getSupportFragmentManager();
             FragmentTransaction ft = fm.beginTransaction();
             ft.replace(R.id.frame_container, fragment);
             ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
             ft.addToBackStack(null);
             ft.commit();
-        }catch(Exception e){
-            if(BuildConfig.DEBUG)
-                Log.e(mContext.getPackageName(),"Error in replacing the fragments");
+        } catch (Exception e) {
+            if (BuildConfig.DEBUG)
+                Log.e(mContext.getPackageName(), "Error in replacing the fragments");
         }
     }
 
@@ -359,10 +334,10 @@ public class HomeActivity extends AppCompatActivity implements OPGGeofenceTrigge
         OPGDBHelper.mContext = HomeActivity.this;
         if (!MySurveysPreference.isDBCreated(mContext)) {
             OPGDBHelper.setDatabaseName(Util.db_name);
-            if(BuildConfig.DEBUG)
+            if (BuildConfig.DEBUG)
                 LogManager.getLogger(getClass()).error(Util.db_name + " SETUP STARTED!");
             OPGDBHelper.getInstance().getWritableDatabase();
-            if(BuildConfig.DEBUG)
+            if (BuildConfig.DEBUG)
                 LogManager.getLogger(getClass()).error(Util.db_name + " SETUP ENDED!");
             MySurveysPreference.setIsDBCreated(mContext, true);
         }
@@ -384,7 +359,7 @@ public class HomeActivity extends AppCompatActivity implements OPGGeofenceTrigge
             });
         }
 
-        if(Util.isServiceRunning(mContext,FetchDataService.class)){
+        if (Util.isServiceRunning(mContext, FetchDataService.class)) {
             refreshAnimationStart();
         }
         return true;
@@ -401,7 +376,7 @@ public class HomeActivity extends AppCompatActivity implements OPGGeofenceTrigge
             if (Util.isOnline(mContext)) {
                 onRefresh();
             } else {
-                if(!Util.isOnline(mContext)) {
+                if (!Util.isOnline(mContext)) {
                     showSnackBar(getString(R.string.no_network_msg), Snackbar.LENGTH_LONG);
                 }
             }
@@ -410,15 +385,14 @@ public class HomeActivity extends AppCompatActivity implements OPGGeofenceTrigge
         return true;
     }
 
-    public void showSnackBar(String text,int duration )
-    {
-        if(notify_tv != null){
+    public void showSnackBar(String text, int duration) {
+        if (notify_tv != null) {
             notify_tv.setText(text);
-            if(countDownTimer!=null){
+            if (countDownTimer != null) {
                 countDownTimer.cancel();
             }
             notify_tv.setVisibility(View.VISIBLE);
-            if(duration != Snackbar.LENGTH_INDEFINITE){
+            if (duration != Snackbar.LENGTH_INDEFINITE) {
                 countDownTimer = new CountDownTimer(4000, 1000) {
 
                     public void onTick(long millisUntilFinished) {
@@ -436,7 +410,7 @@ public class HomeActivity extends AppCompatActivity implements OPGGeofenceTrigge
     }
 
     public void dismissSnackBar() {
-        if(notify_tv!=null)
+        if (notify_tv != null)
             notify_tv.setVisibility(View.GONE);
     }
 
@@ -445,29 +419,27 @@ public class HomeActivity extends AppCompatActivity implements OPGGeofenceTrigge
      */
     private void onRefresh() {
         MySurveysPreference.clearEnabledSurveys(this);
-        if (!Util.isServiceRunning(mContext , FetchDataService.class)) {
+        if (!Util.isServiceRunning(mContext, FetchDataService.class)) {
             refreshAnimationStart();
-                refreshData();
+            refreshData();
         }
     }
 
     private void refreshData() {
-        try
-        {
+        try {
             MySurveysPreference.clearScriptData(mContext);//Clearing local script shared preference
             Util.clearDB("AppNotification");//clearing the db
             MySurveys.clearHashMaps();//clearing all the download hashmaps
             MySurveysPreference.setIsDownloaded(mContext, false);//making the download flag as default (false)
             startService(new Intent(mContext, FetchDataService.class));//calling the background service to download the data
-            if(Util.isServiceRunning(mContext,LocationService.class)) {
-                stopService(new Intent(mContext,LocationService.class));
-                MySurveysPreference.setLastLocationKnown(mContext,"");
+            if (Util.isServiceRunning(mContext, LocationService.class)) {
+                stopService(new Intent(mContext, LocationService.class));
+                MySurveysPreference.setLastLocationKnown(mContext, "");
             }
             deleteAppMediaFolders();
             Util.sendBroadcastMessage(true, mContext, "", Util.BROADCAST_ACTION_REFRESH);//broadcast to refresh the views
-        }catch (Exception ex)
-        {
-            if(BuildConfig.DEBUG) {
+        } catch (Exception ex) {
+            if (BuildConfig.DEBUG) {
                 Log.i(TAG, ex.getMessage());
             }
         }
@@ -480,9 +452,9 @@ public class HomeActivity extends AppCompatActivity implements OPGGeofenceTrigge
             //FilePath related to the profile files in the mysurveys app
             File mySurveysProfileImagePath = new File(Environment.getExternalStorageDirectory() + "/MySurveys/Profile/");
             boolean delMProfileMedPth = deleteDirectory(mContext, mySurveysProfileImagePath);
-        }catch (Exception e){
-            if(BuildConfig.DEBUG){
-                Log.d(TAG,"Delete Exception"+e.toString());
+        } catch (Exception e) {
+            if (BuildConfig.DEBUG) {
+                Log.d(TAG, "Delete Exception" + e.toString());
             }
         }
     }
@@ -533,7 +505,7 @@ public class HomeActivity extends AppCompatActivity implements OPGGeofenceTrigge
      * This method is used to stop the animation for the refresh button present in the actionbar.
      */
     private void refreshAnimationStop() {
-        if (!Util.isServiceRunning(mContext , FetchDataService.class) && refreshMenuItem != null) {
+        if (!Util.isServiceRunning(mContext, FetchDataService.class) && refreshMenuItem != null) {
             refreshMenuItem = mMenu.findItem(R.id.action_refresh);
             refreshMenuItem.getActionView().clearAnimation();
         }
@@ -545,54 +517,39 @@ public class HomeActivity extends AppCompatActivity implements OPGGeofenceTrigge
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults)
-    {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         boolean locationPerGranted = false;
         boolean isLocationDialogDisplayed = false;
-        for (int i = 0, len = permissions.length; i < len; i++)
-        {
+        for (int i = 0, len = permissions.length; i < len; i++) {
             final String permission = permissions[i];
-            if (grantResults[i] == PackageManager.PERMISSION_DENIED)
-            {
+            if (grantResults[i] == PackageManager.PERMISSION_DENIED) {
                 // user rejected the permission
-                boolean showRationale = ActivityCompat.shouldShowRequestPermissionRationale(this,permission );
-                if (! showRationale)
-                {
-                    if(requestCode ==STORAGE_PERMISSION_REQUEST_CODE )
-                    {
-                        Util.showPermissionDialog(this,getString(R.string.storage_permission));
-                    }
-                    else if(requestCode == REQUEST_CODE_PROFILE)
-                    {
-                        switch (permission)
-                        {
-                            case android.Manifest.permission.WRITE_EXTERNAL_STORAGE : Util.showPermissionDialog(this,getString(R.string.gallery_permission));
+                boolean showRationale = ActivityCompat.shouldShowRequestPermissionRationale(this, permission);
+                if (!showRationale) {
+                    if (requestCode == STORAGE_PERMISSION_REQUEST_CODE) {
+                        Util.showPermissionDialog(this, getString(R.string.storage_permission));
+                    } else if (requestCode == REQUEST_CODE_PROFILE) {
+                        switch (permission) {
+                            case android.Manifest.permission.WRITE_EXTERNAL_STORAGE:
+                                Util.showPermissionDialog(this, getString(R.string.gallery_permission));
                                 break;
-                            case Manifest.permission.CAMERA :  Util.showPermissionDialog(this,getString(R.string.camera_permission));
+                            case Manifest.permission.CAMERA:
+                                Util.showPermissionDialog(this, getString(R.string.camera_permission));
                                 break;
                         }
-                    }
-                    else if(requestCode == REQUEST_CODE_LOCATION && !isLocationDialogDisplayed)
-                    {
+                    } else if (requestCode == REQUEST_CODE_LOCATION && !isLocationDialogDisplayed) {
                         isLocationDialogDisplayed = true;
-                        Util.showPermissionDialog(this,getString(R.string.location_permission));
-                    }
-                    else
-                    {
+                        Util.showPermissionDialog(this, getString(R.string.location_permission));
+                    } else {
                         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
                     }
-                }
-                else
-                {
+                } else {
                     super.onRequestPermissionsResult(requestCode, permissions, grantResults);
                 }
-            }
-            else
-            {
-                switch (requestCode)
-                {
-                    case REQUEST_CODE_LOCATION_SETTINGS :
-                        if(!locationPerGranted && Util.locationServicesEnabled(mContext)) {
+            } else {
+                switch (requestCode) {
+                    case REQUEST_CODE_LOCATION_SETTINGS:
+                        if (!locationPerGranted && Util.locationServicesEnabled(mContext)) {
                             MySurveysPreference.setIsGeofencingEnabled(mContext, !MySurveysPreference.getIsGeofencingEnabled(mContext));
                             try {
                                 if (MySurveysPreference.getIsGeofencingEnabled(mContext)) {
@@ -602,7 +559,7 @@ public class HomeActivity extends AppCompatActivity implements OPGGeofenceTrigge
                                 }
                             } catch (OPGException e) {
                                 e.printStackTrace();
-                                MySurveysPreference.setIsGeofencingEnabled(mContext,false);
+                                MySurveysPreference.setIsGeofencingEnabled(mContext, false);
                             }
                             locationPerGranted = true;
                         }
@@ -618,8 +575,7 @@ public class HomeActivity extends AppCompatActivity implements OPGGeofenceTrigge
     protected void onResume() {
         super.onResume();
         //Launching the notificationFragment for status bar
-        if (getIntent() != null && getIntent().getExtras() != null && getIntent().getExtras().containsKey(Util.POSITION))
-        {
+        if (getIntent() != null && getIntent().getExtras() != null && getIntent().getExtras().containsKey(Util.POSITION)) {
             int position = getIntent().getExtras().getInt(Util.POSITION);
             setCurrentTabFragment(position);
             tabLayout.getTabAt(position).select();
@@ -666,8 +622,8 @@ public class HomeActivity extends AppCompatActivity implements OPGGeofenceTrigge
         refreshMenuItem = null;
         snackbar = null;
         rotation = null;
-        opgsdk  = null;
-        updProfileImage  = null;
+        opgsdk = null;
+        updProfileImage = null;
         notify_tv = null;
         countDownTimer = null;
         surveysFragment = null;
@@ -679,6 +635,7 @@ public class HomeActivity extends AppCompatActivity implements OPGGeofenceTrigge
             mGoogleApiClient.disconnect();
         }
     }
+
     @Override
     public void onBackPressed() {
         finish();
@@ -688,7 +645,7 @@ public class HomeActivity extends AppCompatActivity implements OPGGeofenceTrigge
     @Override
     public void onResult(OPGGeofenceStatus opgGeofenceStatus) {
         MySurveysPreference.setIsGeofencingEnabled(mContext, opgGeofenceStatus.isMonitoring());
-        if(!opgGeofenceStatus.isSuccess())
+        if (!opgGeofenceStatus.isSuccess())
             Toast.makeText(mContext, opgGeofenceStatus.getMessage(), Toast.LENGTH_LONG).show();
     }
 
@@ -696,8 +653,8 @@ public class HomeActivity extends AppCompatActivity implements OPGGeofenceTrigge
     //Triggered when the device enters any particular geofence areas
     @Override
     public void didEnterSurveyRegion(Location location, List<OPGGeofenceSurvey> list) {
-        if(BuildConfig.DEBUG)
-            System.out.println("Location:"+location.getLatitude()+"\n List Size:"+list.size());
+        if (BuildConfig.DEBUG)
+            System.out.println("Location:" + location.getLatitude() + "\n List Size:" + list.size());
         try {
             //MySurveys.updateOPGGeofenceSurveys(list,true);
         } catch (Exception e) {
@@ -708,15 +665,14 @@ public class HomeActivity extends AppCompatActivity implements OPGGeofenceTrigge
     //Triggered when the device exit any particular geofence areas
     @Override
     public void didExitSurveyRegion(Location location, List<OPGGeofenceSurvey> list) {
-        if(BuildConfig.DEBUG)
-            System.out.println("Location:"+location.getLatitude()+"\n List Size:"+list.size());
+        if (BuildConfig.DEBUG)
+            System.out.println("Location:" + location.getLatitude() + "\n List Size:" + list.size());
         try {
-           // MySurveys.updateOPGGeofenceSurveys(list,false);
+            // MySurveys.updateOPGGeofenceSurveys(list,false);
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
-
 
 
     @Override
@@ -729,21 +685,21 @@ public class HomeActivity extends AppCompatActivity implements OPGGeofenceTrigge
     }
 
     private void fetchGeofences() {
-        if(MySurveysPreference.getIsGeofencingEnabled(mContext)){
-            if(Util.locationServicesEnabled(mContext)){
+        if (MySurveysPreference.getIsGeofencingEnabled(mContext)) {
+            if (Util.locationServicesEnabled(mContext)) {
                 try {
-                    if(!Util.isServiceRunning(mContext,LocationService.class))
-                    { startService(new Intent(mContext,LocationService.class)); }
-                    else {
-                        if(BuildConfig.DEBUG){
-                            Log.i(TAG,"LocationService already running");
+                    if (!Util.isServiceRunning(mContext, LocationService.class)) {
+                        startService(new Intent(mContext, LocationService.class));
+                    } else {
+                        if (BuildConfig.DEBUG) {
+                            Log.i(TAG, "LocationService already running");
                         }
                     }
 
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-            }else{
+            } else {
                 Util.showLocationServicesError(mContext);
             }
         }
@@ -759,7 +715,7 @@ public class HomeActivity extends AppCompatActivity implements OPGGeofenceTrigge
 
     }
 
-    private class UpdateProfilePic extends AsyncTask<String,Void,String>{
+    private class UpdateProfilePic extends AsyncTask<String, Void, String> {
         OPGPanellistProfile panellistProfile;
         Exception exception;
         String picturePath;
@@ -776,7 +732,7 @@ public class HomeActivity extends AppCompatActivity implements OPGGeofenceTrigge
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            if(uploadProfilePicListener != null){
+            if (uploadProfilePicListener != null) {
                 uploadProfilePicListener.onStartUpload();
             }
         }
@@ -784,26 +740,31 @@ public class HomeActivity extends AppCompatActivity implements OPGGeofenceTrigge
         @Override
         protected String doInBackground(String... strings) {
             String mediaID = null;
-            try
-            {
+            try {
+                if (ActivityCompat.checkSelfPermission(mContext, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED || ActivityCompat.checkSelfPermission(mContext, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                    // TODO: Consider calling
+                    //    ActivityCompat#requestPermissions
+                    // here to request the missing permissions, and then overriding
+                    //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                    //                                          int[] grantResults)
+                    // to handle the case where the user grants the permission. See the documentation
+                    // for ActivityCompat#requestPermissions for more details.
+                    return null;
+                }
                 mediaID = Util.getOPGSDKInstance().uploadMediaFile(picturePath, mContext);
                 panellistProfile = RetriveOPGObjects.getPanellistProfile();
                 panellistProfile.setMediaID(mediaID);
-                if(mediaID != null){
-                    OPGUpdatePanellistProfile opgUpdatePanellistProfile = Util.getOPGSDKInstance().updatePanellistProfile(mContext,panellistProfile);
-                    if(opgUpdatePanellistProfile.isSuccess()){
+                if (mediaID != null) {
+                    OPGUpdatePanellistProfile opgUpdatePanellistProfile = Util.getOPGSDKInstance().updatePanellistProfile(mContext, panellistProfile);
+                    if (opgUpdatePanellistProfile.isSuccess()) {
                         SaveOPGObjects.storePanellistProfile(panellistProfile);
-                    }
-                    else if(opgUpdatePanellistProfile.getStatusMessage().contains(Util.SESSION_TIME_OUT_ERROR))
-                    {
+                    } else if (opgUpdatePanellistProfile.getStatusMessage().contains(Util.SESSION_TIME_OUT_ERROR)) {
                         throw new OPGException(Util.SESSION_TIME_OUT_ERROR);
                     }
                 }
-            }
-            catch (Exception ex)
-            {
+            } catch (Exception ex) {
                 exception = ex;
-                if(BuildConfig.DEBUG) {
+                if (BuildConfig.DEBUG) {
                     Log.i(Util.TAG, ex.getMessage());
                 }
             }
@@ -811,14 +772,13 @@ public class HomeActivity extends AppCompatActivity implements OPGGeofenceTrigge
         }
 
         @Override
-        protected void onPostExecute(String mediaID)
-        {
+        protected void onPostExecute(String mediaID) {
             super.onPostExecute(mediaID);
-            if(uploadProfilePicListener!=null){
-                if(exception != null)
-                    uploadProfilePicListener.onUploadCompleted(mediaID,picturePath,exception.getMessage());
+            if (uploadProfilePicListener != null) {
+                if (exception != null)
+                    uploadProfilePicListener.onUploadCompleted(mediaID, picturePath, exception.getMessage());
                 else
-                    uploadProfilePicListener.onUploadCompleted(mediaID,picturePath,"");
+                    uploadProfilePicListener.onUploadCompleted(mediaID, picturePath, "");
             }
         }
 
@@ -828,31 +788,33 @@ public class HomeActivity extends AppCompatActivity implements OPGGeofenceTrigge
         }
     }
 
-    public interface UploadProfilePicListener{
+    public interface UploadProfilePicListener {
         public void onStartUpload();
-        public void onUploadCompleted(String mediaID, String picturePath,String errorMessage);
+
+        public void onUploadCompleted(String mediaID, String picturePath, String errorMessage);
     }
 
-    public void logout(GoogleApiClient mGoogleApiClient,LogoutListener logoutListener)
-    {
+    public void logout(GoogleApiClient mGoogleApiClient, LogoutListener logoutListener) {
         LogoutAsyncTask asyncTask = new LogoutAsyncTask(logoutListener);
         asyncTask.execute(mGoogleApiClient);
 
     }
-    public interface LogoutListener
-    {
+
+    public interface LogoutListener {
         void onStart();
+
         void onCompleted();
     }
-    public class LogoutAsyncTask extends AsyncTask<GoogleApiClient,Void,Void>
-    {
-        OPGSDK opgsdk ;
+
+    public class LogoutAsyncTask extends AsyncTask<GoogleApiClient, Void, Void> {
+        OPGSDK opgsdk;
         LogoutListener logoutListener;
-        public LogoutAsyncTask( LogoutListener logoutListener)
-        {
+
+        public LogoutAsyncTask(LogoutListener logoutListener) {
             this.opgsdk = new OPGSDK();
             this.logoutListener = logoutListener;
         }
+
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
@@ -861,17 +823,16 @@ public class HomeActivity extends AppCompatActivity implements OPGGeofenceTrigge
 
         @Override
         protected Void doInBackground(GoogleApiClient... params) {
-            if(params.length>0)
-            {
+            if (params.length > 0) {
                 GoogleApiClient mGoogleApiClient = params[0];
 
-                String actionBtnColor  = MySurveysPreference.getThemeActionBtnColor(mContext);
-                String loginBgMediaId     = MySurveysPreference.getLoginBgMediaId(mContext);
+                String actionBtnColor = MySurveysPreference.getThemeActionBtnColor(mContext);
+                String loginBgMediaId = MySurveysPreference.getLoginBgMediaId(mContext);
                 String headerMediaId = MySurveysPreference.getHeaderMediaId(mContext);
                 long panelId = MySurveysPreference.getCurrentPanelID(mContext);
                 String currentPanelName = MySurveysPreference.getCurrentPanelName(mContext);
                 String logoText = MySurveysPreference.getLogoText(mContext);
-                int loginType  = MySurveysPreference.getLoginType(mContext);
+                int loginType = MySurveysPreference.getLoginType(mContext);
                 this.opgsdk.logout(mContext); //SDK Logout
 
                 stopFetchDataService();
@@ -883,9 +844,9 @@ public class HomeActivity extends AppCompatActivity implements OPGGeofenceTrigge
                     signOutFromFacebook(loginType);
                     unregisterFromFCMNotifications();
                 } catch (Exception ex) {
-                    Log.i(TAG,ex.getMessage());
-                }finally {
-                    clearPreferences(actionBtnColor,loginBgMediaId,headerMediaId,panelId,currentPanelName,logoText);
+                    Log.i(TAG, ex.getMessage());
+                } finally {
+                    clearPreferences(actionBtnColor, loginBgMediaId, headerMediaId, panelId, currentPanelName, logoText);
                 }
             }
             return null;
@@ -900,7 +861,7 @@ public class HomeActivity extends AppCompatActivity implements OPGGeofenceTrigge
 
         private void unregisterFromFCMNotifications() {
             String response = this.opgsdk.unRegisterNotifications(mContext, FirebaseInstanceId.getInstance().getToken());
-            if(BuildConfig.DEBUG) {
+            if (BuildConfig.DEBUG) {
                 Log.d("Server Response:", response);
             }
         }
@@ -910,8 +871,7 @@ public class HomeActivity extends AppCompatActivity implements OPGGeofenceTrigge
          * @param loginType
          */
         private void signOutFromFacebook(int loginType) {
-            if(loginType == LoginType.FACEBOOK.ordinal())
-            {
+            if (loginType == LoginType.FACEBOOK.ordinal()) {
                 LoginManager.getInstance().logOut();//Facebook Logout
             }
         }
@@ -921,17 +881,16 @@ public class HomeActivity extends AppCompatActivity implements OPGGeofenceTrigge
          * @param loginType
          */
         private void signOutFromGoogle(int loginType) {
-            if(loginType == LoginType.GOOGLE.ordinal()&& mGoogleApiClient != null && mGoogleApiClient.isConnected())
-            {
+            if (loginType == LoginType.GOOGLE.ordinal() && mGoogleApiClient != null && mGoogleApiClient.isConnected()) {
                 Auth.GoogleSignInApi.signOut(mGoogleApiClient).setResultCallback(
                         new ResultCallback<com.google.android.gms.common.api.Status>() {
                             @Override
                             public void onResult(com.google.android.gms.common.api.Status status) {
-                                if(BuildConfig.DEBUG && status!=null){
-                                    Log.i(TAG,status.getStatusMessage() !=null ? status.getStatusMessage() : "");
-                                    if(status.isSuccess()) //  Use isSuccess() to determine whether the call was successful
+                                if (BuildConfig.DEBUG && status != null) {
+                                    Log.i(TAG, status.getStatusMessage() != null ? status.getStatusMessage() : "");
+                                    if (status.isSuccess()) //  Use isSuccess() to determine whether the call was successful
                                     {
-                                        Log.i(TAG,String.valueOf(status.getStatus().getStatusCode()));
+                                        Log.i(TAG, String.valueOf(status.getStatus().getStatusCode()));
                                     }
                                 }
                             }
@@ -943,8 +902,8 @@ public class HomeActivity extends AppCompatActivity implements OPGGeofenceTrigge
          * Stops the background service which fetch the data from the server.
          */
         private void stopFetchDataService() {
-            if(Util.isServiceRunning(mContext,FetchDataService.class)){
-                mContext.stopService(new Intent(mContext,FetchDataService.class));
+            if (Util.isServiceRunning(mContext, FetchDataService.class)) {
+                mContext.stopService(new Intent(mContext, FetchDataService.class));
             }
         }
 
@@ -952,8 +911,8 @@ public class HomeActivity extends AppCompatActivity implements OPGGeofenceTrigge
          * Stops the location service if it is running in background
          */
         private void stopLocationServiceIfRunning() {
-            if(Util.isServiceRunning(mContext,LocationService.class)){
-                mContext.stopService(new Intent(mContext,LocationService.class));
+            if (Util.isServiceRunning(mContext, LocationService.class)) {
+                mContext.stopService(new Intent(mContext, LocationService.class));
             }
         }
 
@@ -965,8 +924,8 @@ public class HomeActivity extends AppCompatActivity implements OPGGeofenceTrigge
                 if (((HomeActivity) mContext).updProfileImage != null && ((HomeActivity) mContext).updProfileImage.getStatus() != AsyncTask.Status.FINISHED) {
                     ((HomeActivity) mContext).updProfileImage.cancel(true);
                 }
-            }catch (Exception ex){
-                Log.i(TAG,ex.getMessage());
+            } catch (Exception ex) {
+                Log.i(TAG, ex.getMessage());
             }
         }
 
@@ -975,44 +934,48 @@ public class HomeActivity extends AppCompatActivity implements OPGGeofenceTrigge
          */
         private void stopGeofencing() {
             try {
-                this.opgsdk.stopGeofencingMonitor(mContext.getApplicationContext(),((HomeActivity)mContext).getmGoogleApiClient(), (HomeActivity)mContext);
+                this.opgsdk.stopGeofencingMonitor(mContext.getApplicationContext(), ((HomeActivity) mContext).getmGoogleApiClient(), (HomeActivity) mContext);
             } catch (OPGException e) {
-                Log.i(TAG,e.getMessage());
+                Log.i(TAG, e.getMessage());
             }
         }
 
 
-        private void clearPreferences(String actionBtnColor,String loginBgMediaId,String headerMediaId,long panelId,String currentPanelName,String logoText) {
+        private void clearPreferences(String actionBtnColor, String loginBgMediaId, String headerMediaId, long panelId, String currentPanelName, String logoText) {
             MySurveysPreference.clearPreference(mContext); //Clearing SharedPreference
-            MySurveysPreference.setThemeActionBtnColor(mContext,actionBtnColor);
-            MySurveysPreference.setLoginBgMediaId(mContext,loginBgMediaId);
-            MySurveysPreference.setHeaderMediaId(mContext,headerMediaId);
-            MySurveysPreference.setCurrentPanelID(mContext,panelId);
-            MySurveysPreference.setCurrentPanelName(mContext,currentPanelName);
-            MySurveysPreference.setLogoText(mContext,logoText);
+            MySurveysPreference.setThemeActionBtnColor(mContext, actionBtnColor);
+            MySurveysPreference.setLoginBgMediaId(mContext, loginBgMediaId);
+            MySurveysPreference.setHeaderMediaId(mContext, headerMediaId);
+            MySurveysPreference.setCurrentPanelID(mContext, panelId);
+            MySurveysPreference.setCurrentPanelName(mContext, currentPanelName);
+            MySurveysPreference.setLogoText(mContext, logoText);
             Util.clearDB("");  //Clearing DB
             NotificationManager notificationManager = (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
             notificationManager.cancelAll(); // clearing the pending notification
         }
     }
-    public void downloadMedia(DownloadMediaListener downloadMediaListener,long mediaID)
-    {
+
+    public void downloadMedia(DownloadMediaListener downloadMediaListener, long mediaID) {
         DownloadMediaTask downloadMediaTask = new DownloadMediaTask(downloadMediaListener);
-        downloadMediaTask.execute(mediaID+"");
+        downloadMediaTask.execute(mediaID + "");
     }
+
     public interface DownloadMediaListener {
         public void onStartDownload();
+
         public void onDownloadCompleted(String filePath);
+
         public void onDownloadFailed(String errorMsg);
     }
-    public class DownloadMediaTask extends AsyncTask<String, Void, OPGDownloadMedia>
-    {
+
+    public class DownloadMediaTask extends AsyncTask<String, Void, OPGDownloadMedia> {
         DownloadMediaListener downloadMediaListener;
         String mediaID = "";
-        public DownloadMediaTask(DownloadMediaListener downloadMediaListener)
-        {
+
+        public DownloadMediaTask(DownloadMediaListener downloadMediaListener) {
             this.downloadMediaListener = downloadMediaListener;
         }
+
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
@@ -1022,47 +985,54 @@ public class HomeActivity extends AppCompatActivity implements OPGGeofenceTrigge
         @Override
         protected OPGDownloadMedia doInBackground(String... strings) {
             mediaID = strings[0];
-            return Util.getOPGSDKInstance().downloadMediaFile(HomeActivity.this,mediaID, "PNG");
+            if (ActivityCompat.checkSelfPermission(mContext, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED || ActivityCompat.checkSelfPermission(mContext, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                // TODO: Consider calling
+                //    ActivityCompat#requestPermissions
+                // here to request the missing permissions, and then overriding
+                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                //                                          int[] grantResults)
+                // to handle the case where the user grants the permission. See the documentation
+                // for ActivityCompat#requestPermissions for more details.
+                return null;
+            }
+            return Util.getOPGSDKInstance().downloadMediaFile(HomeActivity.this, mediaID, "PNG");
         }
 
         @Override
         protected void onPostExecute(OPGDownloadMedia opgDownloadMedia) {
             super.onPostExecute(opgDownloadMedia);
-            if(opgDownloadMedia != null && opgDownloadMedia.getMediaPath() != null)
-            {
+            if (opgDownloadMedia != null && opgDownloadMedia.getMediaPath() != null) {
                 mediaDownloadingList.remove(mediaID);
                 downloadMediaListener.onDownloadCompleted(opgDownloadMedia.getMediaPath());
-            }
-            else
-            {
+            } else {
                 mediaDownloadingList.remove(mediaID);
                 downloadMediaListener.onDownloadFailed(getString(R.string.err_failed_to_load_profile_pic));
             }
         }
     }
-    public interface OfflineScriptDownloadListener{
+
+    public interface OfflineScriptDownloadListener {
         public void refreshView(OPGSurvey opgSurvey);
     }
 
-    public void setUploadProfilePicListener(UploadProfilePicListener profilePicListener){
+    public void setUploadProfilePicListener(UploadProfilePicListener profilePicListener) {
         uploadProfilePicListener = profilePicListener;
     }
 
-    public void setOfflineRefreshListener(OfflineScriptDownloadListener refreshListener){
+    public void setOfflineRefreshListener(OfflineScriptDownloadListener refreshListener) {
         offlineRefreshListener = refreshListener;
     }
 
-    public void startUploadPic(String filePath){
+    public void startUploadPic(String filePath) {
         updProfileImage = new UpdateProfilePic(filePath).execute();
     }
 
-    public  AsyncTask<String,Void,String> getUpdProfileImage(){
-        return  updProfileImage;
+    public AsyncTask<String, Void, String> getUpdProfileImage() {
+        return updProfileImage;
     }
 
 
-    public void updateTheme()
-    {
+    public void updateTheme() {
         toolbar.setBackgroundColor(Color.parseColor(MySurveysPreference.getThemeActionBtnColor(this)));
         tabLayout.setBackgroundColor(Color.parseColor(MySurveysPreference.getThemeActionBtnColor(this)));
         Util.setStatusBarColor(this);
@@ -1071,11 +1041,9 @@ public class HomeActivity extends AppCompatActivity implements OPGGeofenceTrigge
         tv_header_logo.setVisibility(View.GONE);
         ivHeaderLogo.setVisibility(View.VISIBLE);
         final String mediaID = MySurveysPreference.getHeaderMediaId(this);
-        if(mediaID != null )
-        {
-            String filePath = Util.searchFile(mContext,mediaID, Util.THEME_PICS);
-            if (filePath != null)
-            {
+        if (mediaID != null) {
+            String filePath = Util.searchFile(mContext, mediaID, Util.THEME_PICS);
+            if (filePath != null) {
                 Bitmap imageBitmap = BitmapFactory.decodeFile(new File(filePath).getAbsolutePath());
                 if (imageBitmap != null && ivHeaderLogo != null) {
                     ivHeaderLogo.setImageBitmap(imageBitmap);
@@ -1084,6 +1052,16 @@ public class HomeActivity extends AppCompatActivity implements OPGGeofenceTrigge
                 new AsyncTask<Void, Void, OPGDownloadMedia>() {
                     @Override
                     protected OPGDownloadMedia doInBackground(Void... voids) {
+                        if (ActivityCompat.checkSelfPermission(mContext, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED || ActivityCompat.checkSelfPermission(mContext, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                            // TODO: Consider calling
+                            //    ActivityCompat#requestPermissions
+                            // here to request the missing permissions, and then overriding
+                            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                            //                                          int[] grantResults)
+                            // to handle the case where the user grants the permission. See the documentation
+                            // for ActivityCompat#requestPermissions for more details.
+                            return null;
+                        }
                         return Util.getOPGSDKInstance().downloadMediaFile(mContext, mediaID, "PNG");
                     }
 
@@ -1103,33 +1081,36 @@ public class HomeActivity extends AppCompatActivity implements OPGGeofenceTrigge
                     }
                 }.execute();
             }
-        }
-        else if(MySurveysPreference.getLogoText(mContext) != null)
-        {
+        } else if (MySurveysPreference.getLogoText(mContext) != null) {
             tv_header_logo.setVisibility(View.VISIBLE);
             ivHeaderLogo.setVisibility(View.GONE);
             tv_header_logo.setText(MySurveysPreference.getLogoText(mContext));
-        }
-        else
-        {
+        } else {
             Bitmap bitmap = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.logo);
             //putting default profile image
-            if(bitmap != null) {
+            if (bitmap != null) {
                 ivHeaderLogo.setImageBitmap(bitmap);
             }
         }
         //Downloading the login background image a
         final String mediaId = MySurveysPreference.getLoginBgMediaId(this);
-        if(mediaId != null)
-        {
-            String filePath = Util.searchFile(mContext,mediaId,Util.THEME_PICS);
-            if(filePath == null)
-            {
-                AsyncTask<Void,Void,OPGDownloadMedia>  asyncTask = new AsyncTask<Void,Void,OPGDownloadMedia>()
-                {
+        if (mediaId != null) {
+            String filePath = Util.searchFile(mContext, mediaId, Util.THEME_PICS);
+            if (filePath == null) {
+                AsyncTask<Void, Void, OPGDownloadMedia> asyncTask = new AsyncTask<Void, Void, OPGDownloadMedia>() {
                     @Override
                     protected OPGDownloadMedia doInBackground(Void... voids) {
-                        return Util.getOPGSDKInstance().downloadMediaFile(mContext,mediaId,"PNG");
+                        if (ActivityCompat.checkSelfPermission(mContext, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED || ActivityCompat.checkSelfPermission(mContext, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                            // TODO: Consider calling
+                            //    ActivityCompat#requestPermissions
+                            // here to request the missing permissions, and then overriding
+                            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                            //                                          int[] grantResults)
+                            // to handle the case where the user grants the permission. See the documentation
+                            // for ActivityCompat#requestPermissions for more details.
+                            return null;
+                        }
+                        return Util.getOPGSDKInstance().downloadMediaFile(mContext, mediaId, "PNG");
                     }
                     @Override
                     protected void onPostExecute(OPGDownloadMedia opgDownloadMedia) {

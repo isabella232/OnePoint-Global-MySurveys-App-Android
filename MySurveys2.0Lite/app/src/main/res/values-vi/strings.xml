@@ -1,0 +1,208 @@
+<resources>
+
+    <!--LogIn Page*****************************************-->
+    <string name="sign_in_facebook">Đăng nhập với Facebook</string>
+    <string name="sign_in_google_plus">Đăng nhập với Google</string>
+    <string name="login">Đăng nhập</string>
+    <string name="forgot_password">Quên mật khẩu?</string>
+    <string name="forgot_ur_password">Quên mật khẩu của bạn?</string>
+    <string name="invalid_credential">Mật khẩu không hợp lệ</string>
+    <string name="unauthorised_login">Quyền đăng nhập không hợp lệ</string>
+    <string name="internal_server_error">Lỗi đường truyền nội bộ</string>
+    <string name="can_not_sign_in">Không thể đăng nhập. Thử lại.</string>
+
+    <string name="confirm">Xác nhận</string>
+    <string name="send">Gửi</string>
+    <string name="hint_username">Tên đăng nhập/ Địa chỉ email</string>
+    <string name="hint_password">Mật khẩu</string>
+    <string name="title_forgot_password_dialog">Vui lòng nhập địa chỉ email của bạn.</string>
+    <string name="hint_email_id">Địa chỉ email</string>
+    <!--  <string name="err_name_msg">Name is empty</string>-->
+    <string name="err_username_msg">Tên đăng nhập không được trống</string>
+    <string name="err_password_msg">Mật khẩu không thể trống!</string>
+    <string name="err_invalid_email_id">Vui lòng nhập địa chỉ email hợp lệ.</string>
+    <string name="err_empty_email_id">Vui lòng nhập địa chỉ email của bạn</string>
+
+    <string name="msg_success_mail">Thành công! Vui lòng kiểm tra email của bạn để thấy mật khẩu mới !</string>
+    <string name="unknown_error">Oops ! Không nhận diện được lỗi. Vui lòng thử lại.</string>
+
+
+
+    <!--SurveyPage***********************-->
+    <string name="survey_status_new">Mới</string> <!--The survey is yet to be taken.-->
+    <string name="survey_status_pending">Đang trì hoãn</string><!--The survey is not completed fully-->
+    <string name="survey_status_completed">Đã hoàn thành</string><!--The survey has been taken.-->
+    <string name="survey_status_download">Tải</string>
+    <string name="survey_status_downloading">Đang tải</string>
+    <string name="upload_results">Cập nhật kết quả</string>
+    <string name="survey_status_uploading">Đang cập nhật</string>
+    <string name="no_survey">Không có khảo sát nào có sẵn cho panel được chọn</string>
+    <string name="by_list">Theo danh sách</string>
+
+    <string name="by_location">Theo địa điểm</string>
+    <!--Survey List Item*************************-->
+    <string name="survey_name_dummy">Tên khảo sát</string>
+
+    <!--SurveyByLocation Page*************************-->
+    <string name="enable_geo_location">Để thực hiện những khảo sát liên quan đến vị trí, vui lòng bật « Định vị » trong phần Cài đặt App</string>
+    <string name="enter_survey_location" >Bạn đã nhập địa điểm khảo sát -</string>
+    <string name="geofence_survey_panel_error">Khảo sát được chọn không nằm trong Panel hiện tại. Vui lòng thay đổi Panel để thực hiện khảo sát !</string>
+    <string name="welcome_message_survey">Chào mừng ! Bạn có 1 khảo sát ở đây !</string>
+    <string name="survey_range_error">Bạn không ở trong vị trí này để thực hiện khảo sát !</string>
+
+
+
+    <string name="take_trial">Take a Trial </string>
+    <string name="approx_time">Xấp xỉ</string>
+    <string name="min_time">phút</string>
+    <string name="nooftimtak_str">Số lượng lần thực hiện</string>
+    <!-- <string name="status_sep_str">Status</string>-->
+
+    <string name="unscheduled_str">Chưa săp lịch</string>
+    <string name="no_surveys_msg">Không tìm thấy khảo sát nào</string>
+    <string name="surveys_downloading">Downloading surveys.Please wait!</string>
+
+    <!-- Notification Page ***********************************-->
+    <string name="notification">Thông báo</string>
+    <string name="delete">Xóa</string>
+    <string name="msg_no_notification">Hiện tại chưa có thông báo nào.</string>
+
+    <!-- Settings Page **************************************-->
+    <string name="title_settings">Cài đặt</string>
+    <string name="change_panel">Thay đổi Panel</string>
+    <string name="geo_location">Mã vị trí</string>
+    <string name="change_password">Thay đổi mật khẩu</string>
+    <string name="privacy">Sự riêng tư</string>
+    <string name="terms_condition">Điều khoản &amp; điều kiện</string>
+    <string name="about_us">Về chúng tôi</string>
+    <string name="version">Phiên bản</string>
+
+    <!--ChangePanel-->
+    <string name="current_panel">Panel hiện tại</string>
+    <!--ChangePassword-->
+    <string name="old_password">Mật khẩu cũ</string>
+    <string name="new_password">Mật khẩu mới</string>
+    <string name="confirm_password">Xác nhận mật khẩu</string>
+    <string name="cancel">Hủy</string>
+    <string name="err_empty_pwd">Mật khẩu không thể trống</string>
+    <string name="err_new_and_confirm_pwd_not_same">Mới và xác nhận mật khẩu phải trùng nhau</string>
+    <string name="err_old_and_new_pwd_same">Mật khẩu cũ và mới không thể giống nhau</string>
+    <string name="forgot_password_title">Chúng tôi sẽ gửi cho bạn 1 email để cài đặt lại Mật khẩu qua email</string>
+    <string name="current_password_does_not_exist">Mật khẩu hiện tại không tồn tại</string>
+
+    <!-- Profile Page **************************************-->
+    <string name="profile">Hồ sơ</string>
+    <string name="title_edit_profile">Chỉnh sửa</string>
+    <string name="title_save_profile">Lưu</string>
+    <string name="logout">Đăng xuất</string>
+    <string name="logout_message">Bạn có chắc rằng bạn muốn thoát khỏi ứng dụng?</string><!--Want to logout from App?-->
+    <string name="logout_message_with_results">Vui lòng cập nhật kết quả khảo sát trước khi đăng xuất</string>
+    <string name="title_country_page">Quốc gia</string>
+    <string name="hint_name">Tên</string>
+    <string name="err_name_msg">Tên trống</string>
+    <!--<string name="hint_country">Country</string>-->
+    <string name="err_no_internet">Không có kết nối internet. Vui lòng thử lại!</string><!--Network unavailable.Please try again later-->
+    <string name="err_upload_failed">Failed to upload picture.</string>
+    <string name="err_failed_to_load_profile_pic">Cập nhật hình ảnh hồ sơ không thành công</string>
+    <!--Change Profile Image Dialog Message-->
+    <string name="title_select_photo">Hình hồ sơ</string>
+    <string name="gallery">Thư viện ảnh</string>
+    <!--<string name="delete_image">Remove\n Image</string>-->
+    <string name="camera">Máy ảnh</string>
+
+    <!--*******************ForgotPassword*****-->
+    <string name="email_id_not_exist">Địa chỉ email không tồn tại</string>
+    <string name="enter_your_email_id">Vui lòng nhập địa chỉ email của bạn</string>
+    <string name="email_id_not_found">Địa chỉ email không tìm thấy</string>
+
+    <!--Other*****-->
+    <string name="required_error_msg">Ô này là bắt buộc.</string>
+
+    <string name="loading_survey">Cập nhật khảo sát...</string>
+
+
+    <!--No Network Dialog-->
+    <string name="no_network_msg">Không có kết nối internet. Vui lòng thử lại!</string>
+    <string name="okay">OK</string>
+
+    <!--Sync Dialog-->
+    <string name="sync_msg">Đồng bộ hóa đang diễn ra. Vui lòng chờ !</string>
+    <string name="please_wait">Vui lòng chờ.</string>
+
+    <!--Update Google Play Services-->
+    <string name="update_google_play_service" >Cập nhật App cửa hàng Google để nhận những khảo sát dựa trên địa điểm.</string>
+    <string name="update" >Cập nhật</string>
+
+    <!--Runtime Permission Dialog-->
+    <string name="runtime_permission" >Yêu cầu có sự cho phép của bạn</string>
+    <string name="storage_permission" >Để My Surveys App tải về và lưu trữ Survey Offline.</string>
+    <string name="camera_permission" >Để bạn sử dụng được chức năng chụp hình bên trong My Surveys App.</string>
+    <string name="gallery_permission" >Để My Survey App lưu trữ và tiếp nhận những thông tin như hình ảnh hoặc thẻ nhớ trên điện thoại của bạn.</string>
+    <string name="location_permission" >My Survey App muốn kết nối với vị trí của bạn để thực hiện việc kích hoạt những khảo sát dựa trên địa điểm.</string>
+    <string name="allow" >Cho phép</string>
+
+    <!--Runtime Permissions -->
+    <string name="storage_permission_msg" >Chấp nhận quyền lưu trữ để thực hiện khảo sát. Khảo sát cần quyền truy cập vào các tập tin, hình ảnh,…</string>
+    <string name="access_permission_msg" >Cần quyền lưu trữ để truy cập vào các tập tin, hình ảnh, video…</string>
+    <string name="location_permission_msg" >Cần quyền truy cập vị trí để truy cập vào vị trí của bạn.</string>
+    <string name="camera_permission_msg" >Cần quyền truy cập vào Máy ảnh để lấy thông tin hình ảnh.</string>
+    <string name="audio_permission_msg" >Cần quyền ghi âm để thực hiện ghi âm.</string>
+    <string name="record_permission_msg" >Quyền ghi âm và chụp hình được yêu cầu để quay video</string>
+    <string name="app_settings" >Cài đặt app</string>
+    <string name="activate_storage_msg" >Kích hoạt kho lưu trữ bên dưới danh mục quyền.</string>
+    <string name="deny" >Từ chối</string>
+
+    <!--Geofencing Strings -->
+    <string name="gps_network_not_enabled">Chức năng tìm vị trí chưa được</string>
+    <string name="open_location_settings">Cài đặt vị trí</string>
+    <string name="welcome_to">Chào mừng bạn đã để với</string>
+    <string name="geofence_noti_msg">Bạn đang có sẵn 1 khảo ở khu vực này</string>
+    <string name="survey_available" >Bạn hiện đang có sẵn một khảo sát.</string>
+    <string name="thank_you_for_visiting" >Cám ơn bạn đã tham gia</string>
+
+    <string name="take_survey">Làm khảo sát</string>
+
+    <!-- uploading survey results -->
+    <string name="no_surveys_results">Vui lòng làm khảo sát trước khi cập nhật kết quả</string>
+    <string name="uploading_survey_result">Cập nhật kết quả khảo sát Offline</string>
+    <string name="err_uploading_survey_result">Đang cập nhật kết quả khảo sát. Vui lòng chờ</string>
+    <string name="err_upload_survey_failed">Cập nhật kết quả không thành công</string>
+    <string name="success_results_uploaded">Kế quả đã được cập nhật</string>
+
+    <string name="reason_str" >Lý do:</string>
+    <string name="session_expired_login_again" >Phiên truy cập bị quá hạn. Vui lòng đăng nhập lại.</string>
+    <string name="clear" >Xóa</string>
+    <string name="sign_here_title" >Vui lòng đăng nhập ở đây</string>
+    <string name="title_activity_signature" >Chữ ký</string>
+    <string name="title_activity_currency" >Tiền tệ</string>
+    <string name="ok_str">OK</string>
+
+
+    <string name="ok">OK</string>
+    <string name="permission_camera_rationale" >Kích hoạt quyền chụp hình để sử dụng chức năng này</string>
+    <string name="no_camera_permission" >Ứng dụng này sẽ không hoạt động bởi vì các quyền truy cập máy ảnh bị từ chối. Ứng dụng sẽ tự thoát bây giờ.</string>
+    <string name="low_storage_error"  >Chức năng này sẽ không hoạt động hợp lý vì dung lượng lưu trữ không đủ</string>
+    <!--<string name="title_activity_main"  >Ocr Detector Sample</string>-->
+    <string name="ocr_header" >Nhấn «Nhận diện chữ » để lấy thông tin chữ</string>
+    <string name="read_text"  >Nhận diện chữ</string>
+    <string name="auto_focus" >Tự động tập trung</string>
+    <string name="use_flash"  >Sử dụng Flash</string>
+    <string name="ocr_success"  >Chữ được nhận diện thành công</string>
+    <string name="ocr_failure"  >Chữ chưa được nhận diện</string>
+    <string name="ocr_error"  >Lỗi đọc chữ : %1$s</string>
+    <string name="ocr_capture_msg" >Nhấn vào để nhận diện. Thu nhỏ/ mở rộng màn hình</string>
+
+    <string name="remove">Remove</string>
+    <!-- new strings added -->
+    <string name="upload_count_str" >Surveys to upload</string>
+    <!-- Error messages -->
+    <string name="load_survey_err" >An error occurred while loading the survey</string>
+    <string name="deeplinkurl_err">Failed to load the request</string>
+    <string name="changepwd_unknown_err">An error occurred while changing the password</string>
+    <string name="upd_prf_unknown_err">An error occurred while updating the profile</string>
+    <string name="upd_prf_img_err">An error occurred while updating the profile picture</string>
+    <string name="prf_img_path_err">The image is not found</string>
+    <string name="frgt_pwd_unknown_err">An error occurred while trying to send an email to reset the password</string>
+    <string name="login_unknown_err">Authentication Failed. Please try again</string>
+
+</resources>

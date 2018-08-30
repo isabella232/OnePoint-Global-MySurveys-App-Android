@@ -13,6 +13,8 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Toast;
 
 import com.opg.my.surveys.lite.common.MySurveysPreference;
@@ -55,6 +57,8 @@ public class BrowseActivity extends OPGActivity implements OPGSurveyInterface {
         if(!Util.isTablet(mContext)){
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         }
+
+        updateStatusBarColor();
 
         listPermissionsNeeded = new ArrayList<>();
         sharedPreferences = mContext.getSharedPreferences(getString(R.string.app_name),MODE_PRIVATE);
@@ -99,6 +103,13 @@ public class BrowseActivity extends OPGActivity implements OPGSurveyInterface {
             }
         }
 
+    }
+
+    private void updateStatusBarColor() {
+        Window window = getWindow();
+        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+        window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+        Util.setStatusBarColor(this);
     }
 
     @Override

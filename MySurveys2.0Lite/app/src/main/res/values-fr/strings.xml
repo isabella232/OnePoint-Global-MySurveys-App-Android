@@ -45,7 +45,7 @@
     <string name="logout_message_with_results">Veuillez charger les résultats du sondage avant de vous déconnecter.</string>
     <string name="min_time">min</string>
     <string name="msg_no_notification">Aucune notification à ce jour.</string>
-    <string name="msg_success_mail">Succès ! Un e-mail vous a été envoyé avec un nouveau mot de passe.</string>
+    <string name="msg_success_mail">Succès! Un e-mail vous a été envoyé avec un nouveau mot de passe.</string>
     <string name="new_password">Nouveau mot de passe</string>
     <string name="no_network_msg">Pas de connexion Internet. Veuillez réessayer!</string>
     <string name="no_survey">Pas de sondages disponibles pour le panel sélectionné.</string>
@@ -99,4 +99,56 @@
     <string name="take_trial">"Faites un essai "</string>
     <string name="unscheduled_str">Imprévu</string>
     <string name="welcome_to">Bienvenue à</string>
+    <string name="ok_str">OK</string>
+    <string name="ok">OK</string>
+    <string name="enter_survey_location">"You just entered the survey location - "</string>
+    <string name="update_google_play_service">"Update Google Play Services to get location based surveys "</string>
+    <string name="update">Update</string>
+    <string name="runtime_permission">Your permission required.</string>
+    <string name="storage_permission" >It lets My Surveys App to download and store the offline surveys.</string>
+    <string name="camera_permission">It lets you use camera inside of My Surveys App.</string>
+    <string name="gallery_permission">It lets My Surveys App to store and access information like photos on your phone and SD Card.</string>
+    <string name="location_permission">"My Surveys App would like to access your location to trigger location based surveys. "</string>
+    <string name="allow">allow</string>
+    <string name="access_permission_msg">Need storage permissions to access the files, photos ,videos etc.</string>
+    <string name="storage_permission_msg">Accept storage permissions to take the survey. The survey need access to the files, photos etc.</string>
+    <string name="location_permission_msg">Need location permission to access the location.</string>
+    <string name="camera_permission_msg">Need Camera permission to capture image.</string>
+    <string name="audio_permission_msg">Need record permission to record audio.</string>
+    <string name="record_permission_msg">Camera and audio permissions are required to record video.</string>
+    <string name="app_settings">App Settings</string>
+    <string name="activate_storage_msg">Activate storage under the permissions menu.</string>
+    <string name="deny">Deny</string>
+    <string name="survey_available">You have survey available.</string>
+    <string name="thank_you_for_visiting">Thank You for visiting</string>
+    <string name="session_expired_login_again">Session expired. Please login again</string>
+    <string name="clear">Clear</string>
+    <string name="sign_here_title" >Please sign here</string>
+    <string name="title_activity_signature" >Signature</string>
+    <string name="title_activity_currency" >Currency</string>
+    <string name="permission_camera_rationale" >Activate camera permission to use this.</string>
+    <string name="no_camera_permission" >This application cannot run because it does not have the camera permission. The application will now exit.</string>
+    <string name="low_storage_error" >This feature will not work properly due to less storage.</string>
+    <string name="ocr_header" >Click &quot;Detect Text&quot; to detect text</string>
+    <string name="read_text" >Detect Text</string>
+    <string name="auto_focus" >Auto Focus</string>
+    <string name="use_flash" >Use Flash</string>
+    <string name="ocr_success" >Text captured successfully</string>
+    <string name="ocr_failure" >Text not captured</string>
+    <string name="ocr_error" >" Error reading text: %1$s"</string>
+    <string name="ocr_capture_msg" >Tap to capture. Pinch/Stretch to zoom</string>
+
+    <string name="remove">Remove</string>
+    <!-- new strings added -->
+    <string name="upload_count_str" >Surveys to upload</string>
+    <!-- Error messages -->
+    <string name="load_survey_err" >An error occurred while loading the survey</string>
+    <string name="deeplinkurl_err">Failed to load the request</string>
+    <string name="changepwd_unknown_err">An error occurred while changing the password</string>
+    <string name="upd_prf_unknown_err">An error occurred while updating the profile</string>
+    <string name="upd_prf_img_err">An error occurred while updating the profile picture</string>
+    <string name="prf_img_path_err">The image is not found</string>
+    <string name="frgt_pwd_unknown_err">An error occurred while trying to send an email to reset the password</string>
+    <string name="login_unknown_err">Authentication Failed. Please try again</string>
+
 </resources>
