@@ -22,6 +22,15 @@ This procedure assumes you have already created a repository on GitHub, or have 
 
 3) Clone URL buttonIn the Clone with HTTPs section, click  to copy the clone URL for the repository.
 4) Extract the ZIP file and import the project in Android Studio.
+
+## Intialization
+1)Place your admin username , admin sharedkey and the appversion in the sdkInitialize() method of the RootActivity class.
+
+2)Also generate a AES-256 Encryption and place it in the app/build.gradle file under the AES_KEY as shown below.
+  <u>buildConfigField "String", "AES_KEY", '"Enter the key for the AES-256 Encryption"'</u>
+  The above encryption key is used for encrypting the senstive data in the sharedpreferences and db.
+
+
 ## User Interfaces
 ### LogIn Page
 This is the login screen of MySurveys app. Once you got the username and password ,you can login to app and can take the surveys assigned to you.
@@ -39,6 +48,10 @@ All the geofence surveys assigned to panellist are listed here. Once you enter t
 <p align="center">
   <img src="https://user-images.githubusercontent.com/26483692/38795666-9b501cec-4176-11e8-962d-ea4895d3ebb4.png"/>
 </p>
+
+## Data Protection
+
+MySurveys app takes complete care of security and privacy of data. Personal data provided by people remains protected with OnePoint Global. For more, read this [article ](https://github.com/OnePointGlobal/OnePoint-Global-MySurveys-App-Android/wiki/01.-Data-Protection) 
 
 ## Author
 
