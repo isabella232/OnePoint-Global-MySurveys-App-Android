@@ -417,11 +417,11 @@
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:orientation">horizontal</item>
-        <item name="android:layout_marginRight">61dp</item>
+        <item name="android:layout_marginRight">55dp</item>
         <item name="android:layout_marginTop">66dp</item>
         <item name="android:layout_marginBottom">60dp</item>
-        <item name="android:layout_marginLeft">61dp</item>
-        <item name="android:weightSum">2</item>
+        <item name="android:layout_marginLeft">55dp</item>
+        <item name="android:weightSum">3</item>
     </style>
     <style name="btn_cancel_select_image_style">
         <item name="android:layout_width">wrap_content</item>
@@ -449,6 +449,24 @@
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:text">@string/camera</item>
+        <item name="android:textColor">@color/primary_text_color</item>
+        <item name="android:textSize">19sp</item>
+        <item name="android:layout_marginTop">20dp</item>
+        <item name="android:gravity">center</item>
+    </style>
+
+    <style name="remove_btn_style">
+        <item name="android:layout_width">100dp</item>
+        <item name="android:layout_height">100dp</item>
+        <item name="android:background">@drawable/image_border</item>
+        <item name="android:src">@drawable/profile_delete</item>
+        <item name="android:padding">20dp</item>
+    </style>
+
+    <style name="tv_remove_style">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:text">@string/remove</item>
         <item name="android:textColor">@color/primary_text_color</item>
         <item name="android:textSize">19sp</item>
         <item name="android:layout_marginTop">20dp</item>

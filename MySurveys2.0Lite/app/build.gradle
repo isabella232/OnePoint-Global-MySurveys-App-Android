@@ -2,13 +2,12 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 26
-    buildToolsVersion '26.0.2'
+    compileSdkVersion 28
     defaultConfig {
         multiDexEnabled true
         applicationId "com.opg.my.surveys.lite"
         minSdkVersion 15
-        targetSdkVersion 25
+        targetSdkVersion 28
         versionCode 1
         versionName "2.0.0.lite"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
@@ -33,13 +32,13 @@ android {
 
     buildTypes {
         release {
-            buildConfigField "String", "AES_KEY", '"EnterYourOwnKey"'
+            buildConfigField "String", "AES_KEY", '"Enter the key for the AES-256 Encryption"'
             minifyEnabled true
             debuggable false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
         debug {
-            buildConfigField "String", "AES_KEY",'"EnterYourOwnKey"'
+            buildConfigField "String", "AES_KEY", '"Enter the key for the AES-256 Encryption"'
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
@@ -48,51 +47,49 @@ android {
 
 }
 
+ext{
+    supportLibraryVersion = '28.0.0-alpha1'
+    playServicesVersion = '11.8.0'
+}
+
 dependencies {
-    compile fileTree(include: ['*.jar'], dir: 'libs')
-    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    androidTestImplementation('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
-    androidTestCompile('com.android.support.test.espresso:espresso-intents:2.2.2', {
+    androidTestImplementation('com.android.support.test.espresso:espresso-intents:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
-    //compile project(':shimmer-android')
-    //  compile 'com.android.support:preference-v7:25.0.0'
-    /* compile 'com.android.suopgsdk-release.aarpport:appcompat-v7:24.2.1'
-                                                                                                                                                                                                                                                                                                                                                                                                compile 'com.android.support:design:24.2.1'
-                                                                                                                                                                                                                                                                                                                                                                                                compile 'com.android.support:support-v4:24.2.1'
-                                                                                                                                                                                                                                                                                                                                                                                                compile 'com.android.support:recyclerview-v7:24.2.1'
-                                                                                                                                                                                                                                                                                                                                                                                                compile 'com.android.support:cardview-v7:24.2.1'
-                                                                                                                                                                                                                                                                                                                                                                                                compile 'com.android.support:preference-v7:24.2.1'
-                                                                                                                                                                                                                                                                                                                                                                                                compile 'com.android.support:preference-v14:24.2.1'*/
-    compile 'com.google.android.gms:play-services-auth:11.8.0'
-    compile 'com.google.android.gms:play-services-maps:11.8.0'
-    compile 'com.google.android.gms:play-services-location:11.8.0'
-    compile 'com.android.support:multidex:1.0.1'
-    compile('com.facebook.android:facebook-android-sdk:[4,5)') {
+    implementation "com.google.android.gms:play-services-auth:$playServicesVersion"
+    implementation "com.google.android.gms:play-services-maps:$playServicesVersion"
+    implementation "com.google.android.gms:play-services-location:$playServicesVersion"
+    implementation "com.google.android.gms:play-services-vision:$playServicesVersion"
+    implementation "com.google.firebase:firebase-messaging:$playServicesVersion"
+
+    implementation 'com.android.support:multidex:1.0.1'
+    implementation('com.facebook.android:facebook-android-sdk:[4,5)') {
         exclude group: 'com.google.zxing'
     }
-    /*compile 'de.mindpipe.android:android-logging-log4j:1.0.3'*/
-    testCompile 'junit:junit:4.12'
-    compile 'com.google.firebase:firebase-messaging:11.8.0'
-    compile 'com.android.support:appcompat-v7:26.0.1'
-    compile 'com.android.support:design:26.0.1'
-    compile 'com.android.support:support-v4:26.0.1'
-    compile 'com.android.support:recyclerview-v7:26.0.1'
-    compile 'com.android.support:cardview-v7:26.0.1'
-    compile 'com.android.support:preference-v7:26.0.1'
-    compile 'com.android.support:preference-v14:26.0.1'
-    compile 'com.google.code.gson:gson:2.8.0'
-    compile 'commons-io:commons-io:2.4'
-    compile 'com.android.support.constraint:constraint-layout:1.0.2'
+    testImplementation 'junit:junit:4.12'
+    implementation "com.android.support:appcompat-v7:$supportLibraryVersion"
+    implementation "com.android.support:design:$supportLibraryVersion"
+    implementation "com.android.support:support-v4:$supportLibraryVersion"
+    implementation "com.android.support:recyclerview-v7:$supportLibraryVersion"
+    implementation "com.android.support:cardview-v7:$supportLibraryVersion"
+    implementation "com.android.support:preference-v7:$supportLibraryVersion"
+    implementation "com.android.support:preference-v14:$supportLibraryVersion"
+    implementation 'com.google.code.gson:gson:2.8.0'
+    implementation 'commons-io:commons-io:2.6'
+    implementation 'com.android.support.constraint:constraint-layout:1.1.2'
     // required for searchFile() in Utils
-    compile 'log4j:log4j:1.2.17'
+    implementation 'log4j:log4j:1.2.17'
     //Required for marker clustering on Google map
-    compile 'com.google.maps.android:android-maps-utils:0.5'
+    implementation 'com.google.maps.android:android-maps-utils:0.5'
     //Required for OCR in OCRPlugin
-    compile 'com.google.android.gms:play-services-vision:11.8.0'
     //required for db helper
-    compile project(':opgdbhelper')
-    implementation project(':opgsdk_lite_v1.9')
+    implementation project(':opgdbhelper')
+    //implementation project(':opgsdk_lite_v2.0')
+    implementation 'com.opg.sdk:opgsdk_lite:2.0'
+
 }
 apply plugin: 'com.google.gms.google-services'
